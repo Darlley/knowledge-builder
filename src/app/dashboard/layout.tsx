@@ -1,12 +1,18 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { ReactNode } from 'react';
 
 import DashboardItems from '@/components/DashboardItems';
 import ThemeToggle from '@/components/ThemeToggle';
-import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, User } from '@nextui-org/react';
+import LogotipoIcon from '@/icons/LogotipoIcon';
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  User,
+} from '@nextui-org/react';
 
 export default function layout({ children }: { children: ReactNode }) {
   return (
@@ -15,7 +21,9 @@ export default function layout({ children }: { children: ReactNode }) {
         <div className="flex h-full max-h-screen flex-col shadow-xl bg-gray-100 dark:bg-slate-950">
           <div className="flex h-14 items-center px-4 lg:h-[60px] lg:px-6 border-b dark:border-slate-900">
             <Link href="/" className="flex items-center gap-2 font-semibold ">
-              <Image src="/logo.svg" width={40} height={39} alt="Logo" className='w-auto h-auto' />
+              <span>
+                <LogotipoIcon width="50" height="39" />
+              </span>
 
               <h3 className="text-2xl">
                 Content<span className="text-primary">Flow</span>
@@ -40,7 +48,7 @@ export default function layout({ children }: { children: ReactNode }) {
                   as="button"
                   avatarProps={{
                     isBordered: true,
-                    src: "https://github.com/darlley.png",
+                    src: 'https://github.com/darlley.png',
                   }}
                   className="transition-transform"
                   description="@darlleybbf"
@@ -52,13 +60,9 @@ export default function layout({ children }: { children: ReactNode }) {
                   <p className="font-bold">Signed in as</p>
                   <p className="font-bold">@tonyreichert</p>
                 </DropdownItem>
-                <DropdownItem key="settings">
-                  My Settings
-                </DropdownItem>
+                <DropdownItem key="settings">My Settings</DropdownItem>
                 <DropdownItem key="team_settings">Team Settings</DropdownItem>
-                <DropdownItem key="analytics">
-                  Analytics
-                </DropdownItem>
+                <DropdownItem key="analytics">Analytics</DropdownItem>
                 <DropdownItem key="system">System</DropdownItem>
                 <DropdownItem key="configurations">Configurations</DropdownItem>
                 <DropdownItem key="help_and_feedback">
