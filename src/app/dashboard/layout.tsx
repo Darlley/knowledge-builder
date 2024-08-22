@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { ReactNode } from 'react';
 
 import DashboardItems from '@/components/DashboardItems';
-import ThemeToggle from '@/components/ThemeToggle';
 import LogotipoIcon from '@/icons/LogotipoIcon';
 import {
   Dropdown,
@@ -13,17 +12,21 @@ import {
   DropdownTrigger,
   User,
 } from '@nextui-org/react';
+import ThemeToggle from '@/components/ThemeToggle';
+import { useTheme } from 'next-themes';
 
 export default function layout({ children }: { children: ReactNode }) {
+  const { theme, setTheme } = useTheme();
+
   return (
     <section className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <div className="hidden border-r dark:border-slate-900 bg-muted/40 md:block">
         <div className="flex h-full max-h-screen flex-col shadow-xl bg-gray-100 dark:bg-slate-950">
           <div className="flex h-14 items-center px-4 lg:h-[60px] lg:px-6 border-b dark:border-slate-900">
             <Link href="/" className="flex items-center gap-2 font-semibold ">
-              <span>
+              <div>
                 <LogotipoIcon width="50" height="39" />
-              </span>
+              </div>
 
               <h3 className="text-2xl">
                 Content<span className="text-primary">Flow</span>
@@ -74,7 +77,7 @@ export default function layout({ children }: { children: ReactNode }) {
               </DropdownMenu>
             </Dropdown>
 
-            <ThemeToggle />
+            <ThemeToggle theme={theme} onChange={(switchedTheme) => setTheme(switchedTheme)} />
           </div>
         </header>
         <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 dark:bg-slate-950">
