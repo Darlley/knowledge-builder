@@ -1,0 +1,208 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  directUrl         = env("DIRECT_URL")
+}
+
+// schema.prisma
+
+enum UserRole {
+  OWNER
+  ADMIN
+  EDITOR
+}
+
+model Organization {
+  id            BigInt   @id @default(autoincrement())
+  name          String
+  domain        String
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  teams             Team[]
+  users             User[]
+  userOrganizations UserOrganization[]
+}
+
+model Team {
+  id              BigInt   @id @default(autoincrement())
+  name            String
+  organization_id BigInt
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  organization    Organization @relation(fields: [organization_id], references: [id])
+  users           User[]
+  categories      Category[]
+  topics          Topic[]
+  teamTopics      TeamTopic[]   // Relação inversa para TeamTopic
+}
+
+model User {
+  id              BigInt @id @default(autoincrement())
+  name            String
+  firstName       String
+  lastName        String
+  email           String @unique
+  profileImage    String
+  role            UserRole
+  organization_id BigInt
+  team_id         BigInt?
+  createdAt       DateTime @default(now())
+  updatedAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organization_id], references: [id])
+  team         Team? @relation(fields: [team_id], references: [id])
+  articles     Article[] @relation("ArticleAuthor")
+  edits        ArticleEdit[] @relation("Editor")
+  userPermissions UserPermission[]
+  userOrganizations UserOrganization[]
+}
+
+model Category {
+  id      BigInt   @id @default(autoincrement())
+  name    String
+  team_id BigInt
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  team     Team @relation(fields: [team_id], references: [id])
+  articles ArticleCategory[]
+}
+
+model Article {
+  id           BigInt   @id @default(autoincrement())
+  title        String
+  summary      String?
+  content      Json
+  cover_image_url String?
+  views        BigInt @default(0)
+  author_id    BigInt
+  status       String
+  audience     String
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  author       User @relation("ArticleAuthor", fields: [author_id], references: [id])
+  categories   ArticleCategory[]
+  edits        ArticleEdit[]
+  topics       TopicArticle[]
+}
+
+model ArticleCategory {
+  article_id  BigInt
+  category_id BigInt
+
+  article  Article @relation(fields: [article_id], references: [id])
+  category Category @relation(fields: [category_id], references: [id])
+
+  @@id([article_id, category_id])
+}
+
+model Topic {
+  id      BigInt   @id @default(autoincrement())
+  name    String
+  team_id BigInt
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  team     Team @relation(fields: [team_id], references: [id])
+  articles TopicArticle[]
+  teamTopics TeamTopic[]  // Relação inversa para TeamTopic
+}
+
+model ArticleEdit {
+  id         BigInt   @id @default(autoincrement())
+  article_id BigInt
+  editor_id  BigInt
+  editedAt   DateTime @default(now()) @map("edited_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  article Article @relation(fields: [article_id], references: [id])
+  editor  User @relation("Editor", fields: [editor_id], references: [id])
+}
+
+model TopicArticle {
+  topic_id   BigInt
+  article_id BigInt
+
+  topic   Topic @relation(fields: [topic_id], references: [id])
+  article Article @relation(fields: [article_id], references: [id])
+
+  @@id([topic_id, article_id])
+}
+
+model Permission {
+  id          BigInt   @id @default(autoincrement())
+  name        String
+  description String
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  userPermissions UserPermission[]
+  rolePermissions RolePermission[]
+}
+
+model UserPermission {
+  user_id       BigInt
+  permission_id BigInt
+
+  user       User @relation(fields: [user_id], references: [id])
+  permission Permission @relation(fields: [permission_id], references: [id])
+
+  @@id([user_id, permission_id])
+}
+
+model Role {
+  id          BigInt   @id @default(autoincrement())
+  name        String
+  description String
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  rolePermissions RolePermission[]
+  userOrganizations UserOrganization[]
+}
+
+model RolePermission {
+  role_id       BigInt
+  permission_id BigInt
+
+  role       Role @relation(fields: [role_id], references: [id])
+  permission Permission @relation(fields: [permission_id], references: [id])
+
+  @@id([role_id, permission_id])
+}
+
+model UserOrganization {
+  user_id         BigInt
+  organization_id BigInt
+  role_id         BigInt
+
+  user         User @relation(fields: [user_id], references: [id])
+  organization Organization @relation(fields: [organization_id], references: [id])
+  role         Role @relation(fields: [role_id], references: [id])
+
+  @@id([user_id, organization_id])
+}
+
+model TeamTopic {
+  team_id   BigInt
+  topic_id  BigInt
+
+  team  Team  @relation(fields: [team_id], references: [id])
+  topic Topic @relation(fields: [topic_id], references: [id])
+
+  @@id([team_id, topic_id])
+}
