@@ -14,6 +14,7 @@ import {
 } from '@nextui-org/react';
 import ThemeToggle from '@/components/ThemeToggle';
 import { useTheme } from 'next-themes';
+import { LogoutLink } from '@kinde-oss/kinde-auth-nextjs';
 
 export default function layout({ children }: { children: ReactNode }) {
   const { theme, setTheme } = useTheme();
@@ -58,7 +59,7 @@ export default function layout({ children }: { children: ReactNode }) {
                   name="Darlley Brito"
                 />
               </DropdownTrigger>
-              <DropdownMenu aria-label="User Actions" variant="flat">
+              <DropdownMenu aria-label="User Actions" variant="flat" onAction={(key) => console.log(key)}>
                 <DropdownItem key="profile" className="h-14 gap-2">
                   <p className="font-bold">Signed in as</p>
                   <p className="font-bold">@tonyreichert</p>
@@ -72,7 +73,7 @@ export default function layout({ children }: { children: ReactNode }) {
                   Help & Feedback
                 </DropdownItem>
                 <DropdownItem key="logout" color="danger">
-                  Log Out
+                  <LogoutLink className='w-full flex'>Log out</LogoutLink>
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
