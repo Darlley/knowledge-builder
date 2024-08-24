@@ -1,6 +1,10 @@
 // middleware.js
 import { NextRequest, NextResponse } from 'next/server';
 import subdomains from '../subdomains.json';
+import {
+  authMiddleware,
+  withAuth,
+} from "@kinde-oss/kinde-auth-nextjs/middleware";
 
 export const config = {
   matcher: ['/((?!api/|_next/|_static/|_vercel|[\\w-]+\\.\\w+).*)'],
@@ -9,7 +13,6 @@ export const config = {
 export default async function middleware(req: NextRequest) {
   const url = req.nextUrl;
   const hostname = req.headers.get('host');
-
   // Se define una lista de dominios permitidos (incluyendo localhost y el dominio real)
   const allowedDomains = ['localhost:3000', 'tudominio.com'];
 
