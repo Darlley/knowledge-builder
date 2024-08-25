@@ -31,5 +31,20 @@ model User {
   profileImage    String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @default(now())
+
+  Site            Site[]
+}
+
+model Site {
+  id              String @id @default(uuid())
+  name            String
+  description     String
+  subdirectory    String @unique
+  imageUrl        String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now())
+
+  User            User?   @relation(fields: [userId], references: [id])
+  userId          String?
 }
 
