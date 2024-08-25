@@ -27,26 +27,37 @@ const SiteStore = create<ISiteState>((set, get) => ({
   sites: [],
 
   getSites: async () => {
-    try {
-      const response = await fetch('/api/sites', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+    return new Promise(async (resolve, reject) => {
+      try {
+        const response = await fetch('/api/sites', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
 
-      if (!response.ok) {
-        throw new Error('Erro ao buscar os sites');
+        if (response.ok) {
+          const sites = await response.json();
+          set({ sites });
+          resolve(sites);
+        } else {
+          const result = await response.json();
+          const error: ISiteError = {
+            type: result.type || 'unknownError',
+            message: result.message || 'Erro desconhecido',
+            status: response.status,
+          };
+          reject(error);
+        }
+      } catch (err) {
+        const customError: ISiteError = {
+          type: 'networkError',
+          message: 'Erro de rede ou servidor',
+          status: 500,
+        };
+        reject(customError);
       }
-
-      
-      const sites = await response.json();
-      console.log(sites)
-      set({ sites });
-    } catch (error) {
-      console.error('Erro ao buscar os sites:', error);
-      set({ sites: [] });
-    }
+    });
   },
 
   createSite: (data: Partial<ISite>) => {
