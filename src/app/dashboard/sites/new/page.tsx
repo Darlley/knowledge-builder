@@ -42,14 +42,19 @@ export default function page() {
 
       if (response.ok) {
         // Se a resposta for bem-sucedida, redirecione o usuário
-        toast.success("Site criado com sucesso 🎉")
+        toast.success('Site criado com sucesso 🎉');
         router.push('/dashboard/sites');
       } else {
-        // Lida com erros retornados pela API
         const result = await response.json();
-        console.error('Erro ao criar o site:', result.errors || result.error);
-        toast.error("Houve algum erro...")
-        // Exibir mensagem de erro ao usuário
+        console.error('Erro ao criar o site:', result);
+
+        // Exemplo de tratamento de erro específico
+        if ((result.type = 'directoryExists')) {
+          toast.error('Subdiretório já existe');
+        } else {
+          // Lidar com outros erros
+          toast.error('Houve algum erro...');
+        }
       }
     } catch (error) {
       console.error('Erro na requisição:', error);
