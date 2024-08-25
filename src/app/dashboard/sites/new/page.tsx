@@ -1,5 +1,6 @@
 'use client';
 
+import SiteStore from '@/stores/SiteStore';
 import { siteSchema, SiteSchema } from '@/utils/zodSchemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
@@ -13,6 +14,8 @@ export default function page() {
   const router = useRouter();
   const { getUser } = useKindeBrowserClient();
   const user = getUser();
+
+  const { createSite } = SiteStore()
 
   const {
     control,
@@ -31,34 +34,20 @@ export default function page() {
       return;
     }
 
-    try {
-      const response = await fetch('/api/site/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (response.ok) {
-        // Se a resposta for bem-sucedida, redirecione o usuário
+    await createSite(data)
+      .then(() => {
         toast.success('Site criado com sucesso 🎉');
         router.push('/dashboard/sites');
-      } else {
-        const result = await response.json();
-        console.error('Erro ao criar o site:', result);
-
-        // Exemplo de tratamento de erro específico
-        if ((result.type = 'directoryExists')) {
+      })
+      .catch((error) => {
+        // Tratamento de erros específicos
+        if (error.type === 'directoryExists') {
           toast.error('Subdiretório já existe');
         } else {
           // Lidar com outros erros
           toast.error('Houve algum erro...');
         }
-      }
-    } catch (error) {
-      console.error('Erro na requisição:', error);
-    }
+      });
   };
 
   return (

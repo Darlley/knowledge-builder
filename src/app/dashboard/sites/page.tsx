@@ -1,10 +1,19 @@
 'use client';
 
+import SiteStore from '@/stores/SiteStore';
 import { Button } from '@nextui-org/react';
 import { File, Plus } from 'lucide-react';
 import Link from 'next/link';
+import { useEffect } from 'react';
 
 export default function page() {
+  const { sites, getSites } = SiteStore();
+
+  useEffect(() => {
+    // Buscar os sites ao montar o componente
+    getSites();
+  }, []);
+
   return (
     <>
       <div className="flex w-full justify-end ">

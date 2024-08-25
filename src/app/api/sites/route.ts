@@ -5,6 +5,30 @@ import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { NextResponse } from 'next/server';
 
+export async function GET() {
+  const { getUser } = getKindeServerSession(); // Substitua pela forma correta de obter o usuário
+  const user = await getUser();
+
+
+  try {
+    const sites = await prisma.site.findMany({
+      where: {
+        userId: user?.id,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return NextResponse.json(sites, { status: 200 });
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Erro ao listar os sites' },
+      { status: 500 }
+    );
+  }
+}
+
 // Função para lidar com a rota POST
 export async function POST(request: Request) {
   const { getUser } = getKindeServerSession(); // Substitua pela forma correta de obter o usuário
@@ -39,6 +63,7 @@ export async function POST(request: Request) {
           name,
           description,
           subdirectory,
+          userId: user?.id
         },
       });
 
