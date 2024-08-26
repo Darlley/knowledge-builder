@@ -1,32 +1,53 @@
 'use client';
 
+import SiteStore from '@/stores/SiteStore';
+import { siteSchema, SiteSchema } from '@/utils/zodSchemas';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
 import { Button, Input, Textarea } from '@nextui-org/react';
 import { PlusCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-
-interface IFormInput {
-  name: string;
-  subdirectory: string;
-  description: string;
-}
+import { toast } from 'sonner';
 
 export default function page() {
+  const router = useRouter();
+  const { getUser } = useKindeBrowserClient();
+  const user = getUser();
+
+  const { createSite } = SiteStore()
+
   const {
     control,
     handleSubmit,
     watch,
     reset,
-    formState: { errors, isSubmitting },
-  } = useForm<IFormInput>({
-    defaultValues: {
-      name: '',
-      subdirectory: '',
-      description: '',
-    },
+    formState: { errors, isSubmitting, isLoading },
+  } = useForm<SiteSchema>({
+    resolver: zodResolver(siteSchema),
+    mode: 'onBlur',
   });
 
-  const onSubmit: SubmitHandler<IFormInput> = async (data) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<SiteSchema> = async (data) => {
+    if (!user) {
+      router.push('/api/auth/login');
+      return;
+    }
+
+    await createSite(data)
+      .then(() => {
+        toast.success('Site criado com sucesso 🎉');
+        router.push('/dashboard/sites');
+      })
+      .catch((error) => {
+        // Tratamento de erros específicos
+        if (error.type === 'directoryExists') {
+          toast.error('Subdiretório já existe');
+        } else {
+          // Lidar com outros erros
+          toast.error('Houve algum erro...');
+        }
+      });
   };
 
   return (
@@ -52,15 +73,18 @@ export default function page() {
               rules={{
                 required: 'Campo obrigatório.',
               }}
-              render={({ field }) => (
+              render={({ field: { onChange, value, name } }) => (
                 <Input
                   type="text"
                   autoFocus
                   label="Nome do site"
                   className="text-default-400"
                   variant="bordered"
-                  {...field}
                   isRequired
+                  value={value}
+                  onChange={onChange}
+                  isInvalid={!!errors[name]}
+                  errorMessage={errors[name]?.message}
                 />
               )}
             />
@@ -74,15 +98,17 @@ export default function page() {
               rules={{
                 required: 'Campo obrigatório.',
               }}
-              render={({ field }) => (
+              render={({ field: { onChange, value, name } }) => (
                 <Input
                   type="text"
-                  autoFocus
                   label="Subdiretorio"
                   variant="bordered"
                   className="text-default-400"
-                  {...field}
                   isRequired
+                  value={value}
+                  onChange={onChange}
+                  isInvalid={!!errors[name]}
+                  errorMessage={errors[name]?.message}
                 />
               )}
             />
@@ -96,15 +122,17 @@ export default function page() {
               rules={{
                 required: 'Campo obrigatório.',
               }}
-              render={({ field }) => (
+              render={({ field: { onChange, value, name } }) => (
                 <Textarea
                   type="text"
-                  autoFocus
                   label="Descrição"
                   variant="bordered"
                   className="text-default-400"
-                  {...field}
                   isRequired
+                  value={value}
+                  onChange={onChange}
+                  isInvalid={!!errors[name]}
+                  errorMessage={errors[name]?.message}
                 />
               )}
             />
@@ -114,6 +142,8 @@ export default function page() {
             type="submit"
             color="primary"
             endContent={<PlusCircle className="stroke-[1.5]" />}
+            isDisabled={isSubmitting}
+            isLoading={isSubmitting}
           >
             Criar
           </Button>
