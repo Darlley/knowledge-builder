@@ -40,14 +40,14 @@ export default function page({
           <Button
             endContent={<Book className="stroke-[1.5] size-5" />}
             as={Link}
-            href="/dashboard/sites/new"
+            href="#"
           >
             Visualizar
           </Button>
           <Button
             endContent={<Cog className="stroke-[1.5] size-5" />}
             as={Link}
-            href="/dashboard/sites/new"
+            href="#"
           >
             Configurar
           </Button>
@@ -55,7 +55,7 @@ export default function page({
             endContent={<Plus />}
             color="primary"
             as={Link}
-            href="/dashboard/sites/new"
+            href="#"
           >
             Criar artigo
           </Button>
@@ -81,7 +81,7 @@ export default function page({
             endContent={<Plus />}
             color="primary"
             as={Link}
-            href="/dashboard/sites/new"
+            href="#"
           >
             Criar post
           </Button>
