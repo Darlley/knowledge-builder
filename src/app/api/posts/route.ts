@@ -3,23 +3,14 @@ import prisma from '@/utils/db';
 import { siteSchema } from '@/utils/zodSchemas';
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest) {
-  const { getUser } = getKindeServerSession(); // Substitua pela forma correta de obter o usuário
-  const user = await getUser();
-
-  if (!user) {
-    return NextResponse.redirect('/api/auth/login');
-  }
-
-  const { searchParams } = new URL(request.url);
-  const userId = searchParams.get('userId');
-
+export async function GET(userId: string, siteId: string) {
   try {
-    const sites = await prisma.site.findMany({
+    const sites = await prisma.post.findMany({
       where: {
-        userId
+        userId,
+        siteId
       },
       orderBy: {
         createdAt: 'desc',
@@ -35,6 +26,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// Função para lidar com a rota POST
 export async function POST(request: Request) {
   const { getUser } = getKindeServerSession(); // Substitua pela forma correta de obter o usuário
   const user = await getUser();
@@ -44,7 +36,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const {userId, ...formData} = await request.json();
+    const formData = await request.json();
     const parsed = siteSchema.safeParse(formData);
 
     if (!parsed.success) {
@@ -68,7 +60,7 @@ export async function POST(request: Request) {
           name,
           description,
           subdirectory,
-          userId
+          userId: user?.id
         },
       });
 

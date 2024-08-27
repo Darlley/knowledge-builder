@@ -26,14 +26,14 @@ export default function page() {
   const user = getUser();
 
   useEffect(() => {
-    getSites()
+    getSites(user?.id! as string)
       .then(() => {
         setIsRequestAction(false);
       })
       .catch(() => {
         setIsRequestAction(false);
       });
-  }, []);
+  }, [user]);
 
   return (
     <>

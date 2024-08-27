@@ -22,6 +22,15 @@ enum UserRole {
   EDITOR
 }
 
+enum ArticleStatus {
+  PUBLISHED
+  ARCHIVED
+}
+enum ArticleAudience {
+  CLIENTS
+  EMPLOYEES
+}
+
 model User {
   id              String @id @unique
   name            String
@@ -33,6 +42,7 @@ model User {
   updatedAt       DateTime @default(now())
 
   Site            Site[]
+  posts           Post[]
 }
 
 model Site {
@@ -46,5 +56,25 @@ model Site {
 
   User            User?   @relation(fields: [userId], references: [id])
   userId          String?
+  posts           Post[]
 }
 
+model Post {
+  id              String @id @default(uuid())
+  name            String
+  content         Json
+  description     String
+  slug            String @unique
+  thumbnail       String
+  views           BigInt @default(0)
+  status          ArticleStatus
+  audience        ArticleAudience
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now())
+
+  User            User?   @relation(fields: [userId], references: [id])
+  userId          String?
+  Site            Site? @relation(fields: [siteId], references: [id])
+  siteId          String?
+}

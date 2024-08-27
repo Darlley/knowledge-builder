@@ -1,35 +1,40 @@
 import { create } from 'zustand';
 
-export type ISite = {
+export type IPost = {
   id: string;
   name: string;
+  content: object;
   description: string;
-  subdirectory: string;
-  imageUrl?: string;
+  slug: string;
+  thumbnail?: string;
+  views: number;
+  status: 'published' | 'archived';
+  audience: 'clients' | 'employees';
   createdAt: string;
   updatedAt: string;
   userId: string;
+  siteId: string;
 };
 
-export type ISiteError = {
+export type IPostError = {
   type: string;
   message: string;
   status: number;
 };
 
-export type ISiteState = {
-  sites: ISite[];
-  getSites: (userId: string) => Promise<void>;
-  createSite: (userId: string, data: Partial<ISite>) => Promise<void>;
+export type IPostState = {
+  posts: IPost[];
+  getPosts: (userId: string, siteId: string) => Promise<void>;
+  createPost: (data: Partial<IPost>) => Promise<void>;
 };
 
-const SiteStore = create<ISiteState>((set, get) => ({
-  sites: [],
+const SiteStore = create<IPostState>((set, get) => ({
+  posts: [],
 
-  getSites: async (userId: string) => {
+  getPosts: async (userId: string, siteId: string) => {
     return new Promise(async (resolve, reject) => {
       try {
-        const response = await fetch(`/api/sites?userId=${userId}`, {
+        const response = await fetch(`/api/posts?userId=${userId}&siteId=${siteId}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -37,12 +42,12 @@ const SiteStore = create<ISiteState>((set, get) => ({
         });
 
         if (response.ok) {
-          const sites = await response.json();
-          set({ sites });
-          resolve(sites);
+          const posts = await response.json();
+          set({ posts });
+          resolve(posts);
         } else {
           const result = await response.json();
-          const error: ISiteError = {
+          const error: IPostError = {
             type: result.type || 'unknownError',
             message: result.message || 'Erro desconhecido',
             status: response.status,
@@ -50,7 +55,7 @@ const SiteStore = create<ISiteState>((set, get) => ({
           reject(error);
         }
       } catch (err) {
-        const customError: ISiteError = {
+        const customError: IPostError = {
           type: 'networkError',
           message: 'Erro de rede ou servidor',
           status: 500,
@@ -60,15 +65,15 @@ const SiteStore = create<ISiteState>((set, get) => ({
     });
   },
 
-  createSite: (userId: string, data: Partial<ISite>) => {
+  createPost: (data: Partial<IPost>) => {
     return new Promise(async (resolve, reject) => {
       try {
-        const response = await fetch('/api/sites', {
+        const response = await fetch('/api/posts', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({userId, ...data}),
+          body: JSON.stringify(data),
         });
 
         if (response.ok) {
@@ -78,7 +83,7 @@ const SiteStore = create<ISiteState>((set, get) => ({
         } else {
 
           const result = await response.json();
-          const error: ISiteError = {
+          const error: IPostError = {
             type: result.type || 'unknownError',
             message: result.message || 'Erro desconhecido',
             status: response.status,
@@ -88,7 +93,7 @@ const SiteStore = create<ISiteState>((set, get) => ({
 
         }
       } catch (err) {
-        const customError: ISiteError = {
+        const customError: IPostError = {
           type: 'networkError',
           message: 'Erro de rede ou servidor',
           status: 500,

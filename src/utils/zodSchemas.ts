@@ -7,3 +7,11 @@ export const siteSchema = z.object({
 })
 
 export type SiteSchema = z.infer<typeof siteSchema>;
+
+export const postSchema = z.object({
+  name: z.string().min(1, "O campo é obrigatório.").max(35, "O campo não pode exceder 35 caracteres.."),
+  content: z.string().min(1, "O campo é obrigatório.").max(40, "O campo não pode exceder 40 caracteres."),
+  description: z.string().min(1, "O campo é obrigatório.").max(150, "O campo não pode exceder 150 caracteres."),
+})
+
+export type postSchema = z.infer<typeof postSchema>;

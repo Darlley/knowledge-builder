@@ -34,7 +34,7 @@ export default function page() {
       return;
     }
 
-    await createSite(data)
+    await createSite(user?.id, data)
       .then(() => {
         toast.success('Site criado com sucesso 🎉');
         router.push('/dashboard/sites');
