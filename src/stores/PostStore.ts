@@ -28,7 +28,7 @@ export type IPostState = {
   createPost: (data: Partial<IPost>) => Promise<void>;
 };
 
-const SiteStore = create<IPostState>((set, get) => ({
+const PostsStore = create<IPostState>((set, get) => ({
   posts: [],
 
   getPosts: async (userId: string, siteId: string) => {
@@ -104,4 +104,4 @@ const SiteStore = create<IPostState>((set, get) => ({
   },
 }));
 
-export default SiteStore;
+export default PostsStore;
