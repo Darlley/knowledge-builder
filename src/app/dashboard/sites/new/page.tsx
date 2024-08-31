@@ -51,7 +51,7 @@ export default function page() {
   };
 
   return (
-    <div className="max-w-xl w-full mx-auto flex flex-col gap-8 items-center justify-center mt-20 border dark:border-gray-900 p-8 rounded-xl shadow-xl">
+    <div className="flex flex-1 lg:gap-6 max-w-xl w-full mx-auto flex-col gap-8 items-center justify-center mt-20 border dark:border-gray-900 p-8 rounded-xl shadow-xl">
       <div className="w-full">
         <h2 className="text-xl font-semibold">Criar site</h2>
         <p className="text-sm text-default-600">

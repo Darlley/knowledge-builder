@@ -2,8 +2,15 @@
 
 import PostsStore from '@/stores/PostStore';
 import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
-import { Button, Spinner } from '@nextui-org/react';
-import { Book, Cog, File, Plus } from 'lucide-react';
+import {
+  Button,
+  Spinner,
+  SwitchProps,
+  Tooltip,
+  useSwitch,
+  VisuallyHidden,
+} from '@nextui-org/react';
+import { Cog, Eye, EyeOff, File, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -32,17 +39,20 @@ export default function page({
   }, [user, siteId]);
 
   return (
-    <>
+    <div className='flex flex-1 flex-col gap-4 lg:gap-6 p-4 lg:p-6'>
       <div className="flex w-full justify-between items-center gap-4">
-        <h1 className="text-xl">LeadsZapp</h1>
+        <div className="flex items-center gap-4">
+          <h1 className="text-xl">LeadsZapp</h1>
+          <ThemeSwitch />
+        </div>
 
         <div className="gap-2 flex items-center">
           <Button
-            endContent={<Book className="stroke-[1.5] size-5" />}
+            endContent={<Eye className="stroke-[1.5] size-5" />}
             as={Link}
             href="#"
           >
-            Visualizar
+            Ir para o site
           </Button>
           <Button
             endContent={<Cog className="stroke-[1.5] size-5" />}
@@ -55,7 +65,7 @@ export default function page({
             endContent={<Plus />}
             color="primary"
             as={Link}
-            href="#"
+            href={`/dashboard/sites/${siteId}/create`}
           >
             Criar artigo
           </Button>
@@ -81,7 +91,7 @@ export default function page({
             endContent={<Plus />}
             color="primary"
             as={Link}
-            href="#"
+            href={`/dashboard/sites/${siteId}/create`}
           >
             Criar post
           </Button>
@@ -89,6 +99,51 @@ export default function page({
       ) : (
         <pre>{JSON.stringify(posts, null, 2)}</pre>
       )}
-    </>
+    </div>
+  );
+}
+
+function ThemeSwitch(props: SwitchProps) {
+  const {
+    Component,
+    slots,
+    isSelected,
+    getBaseProps,
+    getInputProps,
+    getWrapperProps,
+  } = useSwitch(props);
+
+  return (
+    <Tooltip
+      color="primary"
+      size="sm"
+      content={isSelected ? 'Arquivar site' : 'Publicar site'}
+      placement="right"
+    >
+      <div className="flex flex-col gap-2 ">
+        <Component {...getBaseProps()}>
+          <VisuallyHidden>
+            <input {...getInputProps()} />
+          </VisuallyHidden>
+          <div
+            {...getWrapperProps()}
+            className={slots.wrapper({
+              class: [
+                'w-8 h-8',
+                'flex items-center justify-center',
+                'rounded-lg bg-default-100 hover:bg-default-200 ',
+                isSelected && 'shadow-xl shadow-primary',
+              ],
+            })}
+          >
+            {isSelected ? (
+              <Eye className="size-4 stroke-1" />
+            ) : (
+              <EyeOff className="size-4 stroke-1" />
+            )}
+          </div>
+        </Component>
+      </div>
+    </Tooltip>
   );
 }

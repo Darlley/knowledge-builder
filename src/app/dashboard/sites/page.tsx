@@ -36,8 +36,8 @@ export default function page() {
   }, [user]);
 
   return (
-    <>
-      <div className="flex w-full justify-end ">
+    <div className='flex flex-1 flex-col gap-4 lg:gap-6 p-4 lg:p-6'>
+      <div className="flex w-full justify-end">
         <Button
           endContent={<Plus />}
           color="primary"
@@ -49,7 +49,7 @@ export default function page() {
       </div>
 
       {isRequestAction ? (
-        <Spinner label="Buscando seus sites..." />
+          <Spinner label="Buscando seus sites..." />
       ) : !sites?.length ? (
         <div className="flex flex-col items-center justify-center rounded-md border border-dashed dark:border-gray-900 p-8 text-center animate-in fade-in-50">
           <div className="p-2 flex items-center justify-center rounded-full size-20 bg-primary-100 dark:bg-none">
@@ -118,6 +118,6 @@ export default function page() {
           ))}
         </div>
       )}
-    </>
+    </div>
   );
 }
