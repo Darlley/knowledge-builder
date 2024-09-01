@@ -1,45 +1,33 @@
+import { PostType } from '@/types/PostType';
 import { create } from 'zustand';
 
-export type IPost = {
-  id: string;
-  name: string;
-  content: object;
-  description: string;
-  slug: string;
-  thumbnail?: string;
-  views: number;
-  status: 'published' | 'archived';
-  audience: 'clients' | 'employees';
-  createdAt: string;
-  updatedAt: string;
-  userId: string;
-  siteId: string;
-};
-
-export type IPostError = {
+export type PostTypeError = {
   type: string;
   message: string;
   status: number;
 };
 
-export type IPostState = {
-  posts: IPost[];
+export type PostTypeState = {
+  posts: PostType[];
   getPosts: (userId: string, siteId: string) => Promise<void>;
-  createPost: (data: Partial<IPost>) => Promise<void>;
+  createPost: (userId: string, siteId: string, data: Partial<PostType>) => Promise<void>;
 };
 
-const PostsStore = create<IPostState>((set, get) => ({
+const PostsStore = create<PostTypeState>((set, get) => ({
   posts: [],
 
   getPosts: async (userId: string, siteId: string) => {
     return new Promise(async (resolve, reject) => {
       try {
-        const response = await fetch(`/api/posts?userId=${userId}&siteId=${siteId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+        const response = await fetch(
+          `/api/posts?userId=${userId}&siteId=${siteId}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
 
         if (response.ok) {
           const posts = await response.json();
@@ -47,7 +35,7 @@ const PostsStore = create<IPostState>((set, get) => ({
           resolve(posts);
         } else {
           const result = await response.json();
-          const error: IPostError = {
+          const error: PostTypeError = {
             type: result.type || 'unknownError',
             message: result.message || 'Erro desconhecido',
             status: response.status,
@@ -55,7 +43,7 @@ const PostsStore = create<IPostState>((set, get) => ({
           reject(error);
         }
       } catch (err) {
-        const customError: IPostError = {
+        const customError: PostTypeError = {
           type: 'networkError',
           message: 'Erro de rede ou servidor',
           status: 500,
@@ -65,10 +53,10 @@ const PostsStore = create<IPostState>((set, get) => ({
     });
   },
 
-  createPost: (data: Partial<IPost>) => {
+  createPost: (userId: string, siteId: string, data: Partial<PostType>) => {
     return new Promise(async (resolve, reject) => {
       try {
-        const response = await fetch('/api/posts', {
+        const response = await fetch(`/api/sites/${siteId}/posts`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -77,23 +65,19 @@ const PostsStore = create<IPostState>((set, get) => ({
         });
 
         if (response.ok) {
-
           resolve();
-
         } else {
-
           const result = await response.json();
-          const error: IPostError = {
+          const error: PostTypeError = {
             type: result.type || 'unknownError',
             message: result.message || 'Erro desconhecido',
             status: response.status,
           };
 
           reject(error);
-
         }
       } catch (err) {
-        const customError: IPostError = {
+        const customError: PostTypeError = {
           type: 'networkError',
           message: 'Erro de rede ou servidor',
           status: 500,

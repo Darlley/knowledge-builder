@@ -1,0 +1,14 @@
+POST http://localhost:3000/api/sites/:siteId/posts
+Content-Type: application/json
+
+{
+  "userId": "",
+  "title": "teste",
+  "content": "content",
+  "description": "description",
+  "slug": "slug",
+  "thumbnail": "http:thumbnail",
+  "status": "PUBLISHED",
+  "audience": "CLIENTS",
+  "views": 0
+}

@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+/**
+ * SITE
+ */
+
 export const siteSchema = z.object({
   name: z.string().min(1, "O campo é obrigatório.").max(35, "O campo não pode exceder 35 caracteres.."),
   subdirectory: z.string().min(1, "O campo é obrigatório.").max(40, "O campo não pode exceder 40 caracteres."),
@@ -8,11 +12,20 @@ export const siteSchema = z.object({
 
 export type SiteSchema = z.infer<typeof siteSchema>;
 
+
+/**
+ * POST
+ */
+
 export const postSchema = z.object({
-  name: z.string().min(1, "O campo é obrigatório.").max(35, "O campo não pode exceder 35 caracteres.."),
-  content: z.string().min(1, "O campo é obrigatório."),
-  description: z.string().min(1, "O campo é obrigatório.").max(150, "O campo não pode exceder 150 caracteres."),
-  slug: z.string().min(1, "O campo é obrigatório.").max(150, "O campo não pode exceder 150 caracteres."),
+  title: z.string().min(1, "O campo é obrigatório.").max(100, "O campo não pode exceder 100 caracteres.."),
+  slug: z.string().min(1, "O campo é obrigatório.").max(200, "O campo não pode exceder 200 caracteres."),
+  thumbnail: z.string(),
+  description: z.string().min(1, "O campo é obrigatório.").max(200, "O campo não pode exceder 200 caracteres."),
+  content: z.string(),
+  status: z.enum(["PUBLISHED", "ARCHIVED"]).default("ARCHIVED"),
+  audience: z.enum(["CLIENTS", "EMPLOYEES"]).default("CLIENTS"),
+  views: z.number().default(0)
 })
 
-export type postSchema = z.infer<typeof postSchema>;
+export type PostSchema = z.infer<typeof postSchema>;

@@ -1,17 +1,12 @@
 // src/app/api/create-site/route.ts
 import prisma from '@/utils/db';
+import { requireUser } from '@/utils/requireUser';
 import { postSchema } from '@/utils/zodSchemas';
-import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
-  const { getUser } = getKindeServerSession(); // Substitua pela forma correta de obter o usuário
-  const user = await getUser();
-
-  if (!user) {
-    return NextResponse.redirect('/api/auth/login');
-  }
+  const user = requireUser();
 
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get('userId');
@@ -25,9 +20,9 @@ export async function GET(request: NextRequest) {
       },
       select: {
         thumbnail: true,
-        name: true,
+        title: true,
         createdAt: true,
-        id: true
+        id: true,
       },
       orderBy: {
         createdAt: 'desc',
@@ -44,16 +39,13 @@ export async function GET(request: NextRequest) {
 }
 
 // Função para lidar com a rota POST
-export async function POST(request: Request) {
-  const { getUser } = getKindeServerSession(); // Substitua pela forma correta de obter o usuário
-  const user = await getUser();
+export async function POST(request: NextRequest) {
+  const siteId = request.nextUrl.pathname.split('/')[3];
 
-  if (!user) {
-    return NextResponse.redirect('/api/auth/login');
-  }
+  const user = requireUser();
 
   try {
-    const { userId, siteId, ...formData } = await request.json();
+    const { userId, ...formData } = await request.json();
     const parsed = postSchema.safeParse(formData);
 
     if (!parsed.success) {
@@ -68,51 +60,42 @@ export async function POST(request: Request) {
       );
     }
 
-    const { name, content, description } = parsed.data;
+    const { title, content, description, slug, thumbnail, status, audience } = parsed.data;
 
     // Tentar criar o site
     try {
       await prisma.post.create({
         data: {
-          name,
+          title,
+          content: JSON.stringify(content),
           description,
+          slug,
+          thumbnail,
+          status,
+          audience,
+          siteId,
+          userId,
+          views: 0,
         },
       });
 
       // Retornar sucesso
       return NextResponse.json(
-        { message: 'Site criado com sucesso' },
+        { message: 'Artigo criado com sucesso.' },
         { status: 200 }
       );
     } catch (prismaError) {
-      // Verificar se o erro é uma instância de PrismaClientKnownRequestError
-      if (prismaError instanceof PrismaClientKnownRequestError) {
-        // Tratar erros específicos do Prisma
-        if (prismaError.code === 'P2002') {
-          // Violação de unicidade (subdirectory)
-          return NextResponse.json(
-            {
-              type: 'directoryExists',
-              message: 'Subdiretório já existe',
-              status: 400,
-            },
-            { status: 400 }
-          );
-        }
-      }
-
       // Outros erros do Prisma
       return NextResponse.json(
         {
           type: 'serverError',
-          message: 'Erro ao criar o site',
+          message: 'Erro ao criar o artigo',
           status: 500,
         },
         { status: 500 }
       );
     }
   } catch (error) {
-    // Erro inesperado
     return NextResponse.json(
       {
         type: 'serverError',

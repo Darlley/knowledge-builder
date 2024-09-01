@@ -1,7 +1,11 @@
 'use client';
 
 import NovelEditor from '@/components/editor/NovelEditor';
+import PostsStore from '@/stores/PostStore';
 import { UploadDropzone } from '@/utils/uploadthing';
+import { postSchema, PostSchema } from '@/utils/zodSchemas';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
 import {
   Avatar,
   AvatarGroup,
@@ -13,8 +17,10 @@ import {
 } from '@nextui-org/react';
 import { Check, ChevronRight, Dot, Eye, House, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { JSONContent } from 'novel';
 import { useState } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
 const EDITOR_INITIAL_VALUE: JSONContent = {
@@ -25,7 +31,7 @@ const EDITOR_INITIAL_VALUE: JSONContent = {
       content: [
         {
           type: 'text',
-          text: 'Comece a escrever aqui o seu artigo Darlley 🥳',
+          text: 'Comece a escrever aqui o seu artigo 🥳',
         },
       ],
     },
@@ -34,7 +40,7 @@ const EDITOR_INITIAL_VALUE: JSONContent = {
       content: [
         {
           type: 'text',
-          text: 'Para mais comando digite "/"',
+          text: 'Para mais comando digite /',
         },
       ],
     },
@@ -49,11 +55,40 @@ export default function ArticleCleatePage({
   };
 }) {
   const { id: siteId } = params;
+  const { getUser } = useKindeBrowserClient();
+  const user = getUser();
+
+  const router = useRouter();
+
+  const { createPost } = PostsStore();
 
   const [imageUrl, setImageUrl] = useState<null | string>(null);
   const [value, setValue] = useState<undefined | JSONContent>(
     EDITOR_INITIAL_VALUE
   );
+
+  const {
+    control,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors, isSubmitting, isLoading },
+  } = useForm<PostSchema>({
+    resolver: zodResolver(postSchema),
+    mode: 'onBlur',
+  });
+
+  const onSubmit: SubmitHandler<PostSchema> = async (data) => {
+    await createPost(user?.id!, siteId, data)
+      .then(() => {
+        toast.success('Site criado com sucesso 🎉');
+        router.push('/dashboard/sites');
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error('Houve algum erro...');
+      });
+  };
 
   return (
     <div className=" overflow-hidden grid grid-cols-12 w-full h-full flex-grow flex-col md:flex-row md:justify-between">
