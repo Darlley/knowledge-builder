@@ -17,6 +17,30 @@ import { JSONContent } from 'novel';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
+const EDITOR_INITIAL_VALUE: JSONContent = {
+  type: 'doc',
+  content: [
+    {
+      type: 'paragraph',
+      content: [
+        {
+          type: 'text',
+          text: 'Comece a escrever aqui o seu artigo Darlley 🥳',
+        },
+      ],
+    },
+    {
+      type: 'paragraph',
+      content: [
+        {
+          type: 'text',
+          text: 'Para mais comando digite "/"',
+        },
+      ],
+    },
+  ],
+};
+
 export default function ArticleCleatePage({
   params,
 }: {
@@ -27,25 +51,14 @@ export default function ArticleCleatePage({
   const { id: siteId } = params;
 
   const [imageUrl, setImageUrl] = useState<null | string>(null);
-  const [value, setValue] = useState<undefined | JSONContent>({
-    type: 'doc',
-    content: [
-      {
-        type: 'paragraph',
-        content: [
-          {
-            type: 'text',
-            text: 'Comece a escrever...',
-          },
-        ],
-      },
-    ],
-  });
+  const [value, setValue] = useState<undefined | JSONContent>(
+    EDITOR_INITIAL_VALUE
+  );
 
   return (
-    <div className="grid grid-cols-12 w-full h-full flex-grow flex-col md:flex-row md:justify-between gap-4">
-      <div className="col-span-8 flex flex-col gap-4 lg:gap-6 p-4">
-        <nav aria-label="Breadcrumb">
+    <div className=" overflow-hidden grid grid-cols-12 w-full h-full flex-grow flex-col md:flex-row md:justify-between">
+      <div className="relative col-span-8 flex flex-col h-full max-h-full overflow-y-auto">
+        <nav aria-label="Breadcrumb" className="p-4">
           <ol className="flex items-center gap-1 text-sm text-default-400">
             <li>
               <Link
@@ -71,17 +84,29 @@ export default function ArticleCleatePage({
               <ChevronRight className="size-3 stroke-1" />
             </li>
             <li>
+              <Link
+                href="sites"
+                className="block transition hover:text-default-300"
+              >
+                LeadsZapp
+              </Link>
+            </li>
+            <li className="rtl:rotate-180">
+              <ChevronRight className="size-3 stroke-1" />
+            </li>
+            <li>
               <span className="block transition text-default-500">
                 Criando artigo
               </span>
             </li>
           </ol>
         </nav>
-        <div className="w-full flex flex-col gap-1">
+
+        <div className="w-full flex flex-col gap-1 border-b dark:border-gray-900 p-4">
           <Input
             type="text"
             variant="bordered"
-            label="Titulo"
+            label="Titulo do artigo"
             labelPlacement="outside"
             isRequired={true}
             placeholder="Escreva um titulo"
@@ -92,12 +117,13 @@ export default function ArticleCleatePage({
             <span>Por Darlley Brito</span>
           </div>
         </div>
-        <div className="relative">
+
+        <div className="flex-grow p-6 max-h-full overflow-y-auto text-sm">
           <NovelEditor initialValue={value} onChange={setValue} />
         </div>
       </div>
 
-      <div className="col-span-4 flex flex-col gap-4 lg:gap-6 p-4 border-l border-gray-900 h-full">
+      <div className="col-span-4 flex flex-col gap-4 lg:gap-6 p-4 border-l dark:border-gray-900 h-full max-h-full overflow-y-auto">
         <div className="flex gap-2">
           <Button startContent={<Eye />}>Visualizar</Button>
           <Button startContent={<Check />} color="primary">
@@ -148,12 +174,12 @@ export default function ArticleCleatePage({
           label="Resumo / Tweet"
           labelPlacement="outside"
           classNames={{
-            inputWrapper: 'bg-gray-900',
+            inputWrapper: 'dark:bg-gray-900',
           }}
           description="Escreve um pequeno resumo do seu artigo."
         />
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1">
           <h3>Escolha imagem de capa</h3>
           {imageUrl ? (
             <Image
@@ -167,7 +193,8 @@ export default function ArticleCleatePage({
               endpoint="imageUploader"
               appearance={{
                 button: 'bg-primary rounded-lg text-sm',
-                container: 'border-default bg-gray-900 w-full cursor-pointer',
+                container:
+                  'dark:border-default bg-default-100 dark:bg-gray-900 w-full cursor-pointer',
                 label: 'text-primary hover:text-primary-600',
               }}
               onClientUploadComplete={(res) => {

@@ -12,5 +12,6 @@ export default withUt({
     nextui({
       defaultTheme: 'light',
     }),
+    require('@tailwindcss/typography')
   ],
 });
