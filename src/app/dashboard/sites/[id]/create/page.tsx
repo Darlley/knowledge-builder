@@ -1,13 +1,19 @@
+'use client';
+
+import { UploadDropzone } from '@/utils/uploadthing';
 import {
   Avatar,
   AvatarGroup,
   Button,
+  Image,
   Input,
   Textarea,
   User,
 } from '@nextui-org/react';
 import { Check, ChevronRight, Dot, Eye, House, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 export default function ArticleCleatePage({
   params,
@@ -17,6 +23,8 @@ export default function ArticleCleatePage({
   };
 }) {
   const { id: siteId } = params;
+
+  const [imageUrl, setImageUrl] = useState<null | string>(null);
 
   return (
     <div className="grid grid-cols-12 w-full h-full flex-grow flex-col md:flex-row md:justify-between gap-4">
@@ -76,7 +84,6 @@ export default function ArticleCleatePage({
           sapiente asperiores maxime fuga harum natus sequi explicabo provident
           minus facere atque ratione laborum labore voluptatem, et repellat
           eius, exercitationem obcaecati nostrum! Nobis repellendus ea quasi?
-
           Lorem ipsum, dolor sit amet consectetur adipisicing elit. Magni, unde
           iusto. Fuga neque impedit facilis veritatis quos excepturi nisi
           voluptatibus sapiente eligendi cupiditate magni deserunt ipsum
@@ -95,7 +102,7 @@ export default function ArticleCleatePage({
           </Button>
         </div>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 ">
           <div className="flex flex-col gap-2">
             <h3>Publicado por</h3>
             <div>
@@ -137,8 +144,39 @@ export default function ArticleCleatePage({
         <Textarea
           label="Resumo / Tweet"
           labelPlacement="outside"
+          classNames={{
+            inputWrapper: 'bg-gray-900',
+          }}
           description="Escreve um pequeno resumo do seu artigo."
         />
+
+        <div className="flex flex-col gap-2">
+          <h3>Escolha imagem de capa</h3>
+          {imageUrl ? (
+            <Image
+              isBlurred
+              className="w-full object-cover max-h-[400px]"
+              src={imageUrl}
+              alt="Preview da Thumbnail"
+            />
+          ) : (
+            <UploadDropzone
+              endpoint="imageUploader"
+              appearance={{
+                button: 'bg-primary rounded-lg text-sm',
+                container: 'border-default bg-gray-900 w-full cursor-pointer',
+                label: 'text-primary hover:text-primary-600',
+              }}
+              onClientUploadComplete={(res) => {
+                setImageUrl(res[0].url);
+                toast.success('Imagem enviada 🎉');
+              }}
+              onUploadError={() => {
+                toast.error('something went wrong...');
+              }}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

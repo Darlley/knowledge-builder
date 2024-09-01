@@ -1,7 +1,8 @@
 import type { Config } from "tailwindcss";
 import { nextui } from '@nextui-org/react';
+import { withUt } from "uploadthing/tw";
 
-const config: Config = {
+export default withUt({
   content: [
     './src/**/*.{js,ts,jsx,tsx,mdx}',
     './node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}',
@@ -12,5 +13,4 @@ const config: Config = {
       defaultTheme: 'light',
     }),
   ],
-};
-export default config;
+});
