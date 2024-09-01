@@ -6,21 +6,13 @@ import { UploadDropzone } from '@/utils/uploadthing';
 import { postSchema, PostSchema } from '@/utils/zodSchemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
-import {
-  Avatar,
-  AvatarGroup,
-  Button,
-  Image,
-  Input,
-  Textarea,
-  User,
-} from '@nextui-org/react';
+import { Button, Image, Input, Textarea, User } from '@nextui-org/react';
 import { Check, ChevronRight, Dot, Eye, House, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { JSONContent } from 'novel';
 import { useState } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
 const EDITOR_INITIAL_VALUE: JSONContent = {
@@ -91,7 +83,7 @@ export default function ArticleCleatePage({
   };
 
   return (
-    <div className=" overflow-hidden grid grid-cols-12 w-full h-full flex-grow flex-col md:flex-row md:justify-between">
+    <form className="overflow-hidden grid grid-cols-12 w-full h-full flex-grow flex-col md:flex-row md:justify-between">
       <div className="relative col-span-8 flex flex-col h-full max-h-full overflow-y-auto">
         <nav aria-label="Breadcrumb" className="p-4">
           <ol className="flex items-center gap-1 text-sm text-default-400">
@@ -136,15 +128,27 @@ export default function ArticleCleatePage({
             </li>
           </ol>
         </nav>
-
         <div className="w-full flex flex-col gap-1 border-b dark:border-gray-900 p-4">
-          <Input
-            type="text"
-            variant="bordered"
-            label="Titulo do artigo"
-            labelPlacement="outside"
-            isRequired={true}
-            placeholder="Escreva um titulo"
+          <Controller
+            name="title"
+            control={control}
+            rules={{
+              required: 'Campo obrigatório.',
+            }}
+            render={({ field: { onChange, value, name } }) => (
+              <Input
+                type="text"
+                variant="bordered"
+                label="Titulo do artigo"
+                labelPlacement="outside"
+                isRequired={true}
+                placeholder="Escreva um titulo"
+                value={value}
+                onChange={onChange}
+                isInvalid={!!errors[name]}
+                errorMessage={errors[name]?.message}
+              />
+            )}
           />
           <div className="flex items-center text-sm text-default-400">
             <span>Última atualização 30 Ago, 2024</span>
@@ -152,20 +156,17 @@ export default function ArticleCleatePage({
             <span>Por Darlley Brito</span>
           </div>
         </div>
-
         <div className="flex-grow p-6 max-h-full overflow-y-auto text-sm">
           <NovelEditor initialValue={value} onChange={setValue} />
         </div>
       </div>
-
       <div className="col-span-4 flex flex-col gap-4 lg:gap-6 p-4 border-l dark:border-gray-900 h-full max-h-full overflow-y-auto">
         <div className="flex gap-2">
           <Button startContent={<Eye />}>Visualizar</Button>
-          <Button startContent={<Check />} color="primary">
+          <Button type="submit" startContent={<Check />} color="primary">
             Salvar
           </Button>
         </div>
-
         <div className="flex flex-col gap-4 ">
           <div className="flex flex-col gap-2">
             <h3>Publicado por</h3>
@@ -179,39 +180,59 @@ export default function ArticleCleatePage({
               />
             </div>
           </div>
-          <div className="flex flex-col gap-2">
+          {/* <div className="flex flex-col gap-2">
             <h3>Atualizado por</h3>
             <AvatarGroup isBordered>
               <Avatar src="https://i.pravatar.cc/150?u=a042581f4e29026024d" />
               <Avatar src="https://i.pravatar.cc/150?u=a04258a2462d826712d" />
             </AvatarGroup>
-          </div>
+          </div> */}
         </div>
-
         <h1>Configurações do artigo</h1>
-
-        <Input
-          type="text"
-          variant="bordered"
-          label="Slug"
-          labelPlacement="outside"
-          isRequired={true}
-          placeholder="Slug do artigo"
-          description="exemplo: 'artigo-sobre-financas'"
-          endContent={
-            <Button size="sm" isIconOnly color="primary" radius="full">
-              <RotateCcw className="size-4 stroke-[1.5]" />
-            </Button>
-          }
+        <Controller
+          name="slug"
+          control={control}
+          rules={{
+            required: 'Campo obrigatório.',
+          }}
+          render={({ field: { onChange, value, name } }) => (
+            <Input
+              type="text"
+              variant="bordered"
+              label="Slug"
+              labelPlacement="outside"
+              isRequired={true}
+              placeholder="Slug do artigo"
+              description="exemplo: 'artigo-sobre-financas'"
+              endContent={
+                <Button size="sm" isIconOnly color="primary" radius="full">
+                  <RotateCcw className="size-4 stroke-[1.5]" />
+                </Button>
+              }
+              value={value}
+              onChange={onChange}
+              isInvalid={!!errors[name]}
+              errorMessage={errors[name]?.message}
+            />
+          )}
         />
 
-        <Textarea
-          label="Resumo / Tweet"
-          labelPlacement="outside"
-          classNames={{
-            inputWrapper: 'dark:bg-gray-900',
-          }}
-          description="Escreve um pequeno resumo do seu artigo."
+        <Controller
+          name="description"
+          control={control}
+          render={({ field: { onChange, value, name } }) => (
+            <Textarea
+              label="Resumo"
+              labelPlacement="outside"
+              classNames={{
+                inputWrapper: 'dark:bg-gray-900',
+              }}
+              rows={5}
+              description="Escreve um pequeno resumo do seu artigo."
+              value={value}
+              onChange={onChange}
+            />
+          )}
         />
 
         <div className="flex flex-col gap-1">
@@ -243,6 +264,6 @@ export default function ArticleCleatePage({
           )}
         </div>
       </div>
-    </div>
+    </form>
   );
 }
