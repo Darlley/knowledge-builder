@@ -1,5 +1,6 @@
 'use client';
 
+import NovelEditor from '@/components/editor/NovelEditor';
 import { UploadDropzone } from '@/utils/uploadthing';
 import {
   Avatar,
@@ -12,6 +13,7 @@ import {
 } from '@nextui-org/react';
 import { Check, ChevronRight, Dot, Eye, House, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
+import { JSONContent } from 'novel';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -25,6 +27,20 @@ export default function ArticleCleatePage({
   const { id: siteId } = params;
 
   const [imageUrl, setImageUrl] = useState<null | string>(null);
+  const [value, setValue] = useState<undefined | JSONContent>({
+    type: 'doc',
+    content: [
+      {
+        type: 'paragraph',
+        content: [
+          {
+            type: 'text',
+            text: 'Comece a escrever...',
+          },
+        ],
+      },
+    ],
+  });
 
   return (
     <div className="grid grid-cols-12 w-full h-full flex-grow flex-col md:flex-row md:justify-between gap-4">
@@ -76,21 +92,8 @@ export default function ArticleCleatePage({
             <span>Por Darlley Brito</span>
           </div>
         </div>
-        <div>
-          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Magni, unde
-          iusto. Fuga neque impedit facilis veritatis quos excepturi nisi
-          voluptatibus sapiente eligendi cupiditate magni deserunt ipsum
-          consectetur, exercitationem facere tempore? Qui excepturi quibusdam ad
-          sapiente asperiores maxime fuga harum natus sequi explicabo provident
-          minus facere atque ratione laborum labore voluptatem, et repellat
-          eius, exercitationem obcaecati nostrum! Nobis repellendus ea quasi?
-          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Magni, unde
-          iusto. Fuga neque impedit facilis veritatis quos excepturi nisi
-          voluptatibus sapiente eligendi cupiditate magni deserunt ipsum
-          consectetur, exercitationem facere tempore? Qui excepturi quibusdam ad
-          sapiente asperiores maxime fuga harum natus sequi explicabo provident
-          minus facere atque ratione laborum labore voluptatem, et repellat
-          eius, exercitationem obcaecati nostrum! Nobis repellendus ea quasi?
+        <div className="relative">
+          <NovelEditor initialValue={value} onChange={setValue} />
         </div>
       </div>
 
