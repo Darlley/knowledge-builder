@@ -6,7 +6,18 @@ import { UploadDropzone } from '@/utils/uploadthing';
 import { postSchema, PostSchema } from '@/utils/zodSchemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
-import { Button, Image, Input, Textarea, User } from '@nextui-org/react';
+import {
+  Avatar,
+  AvatarGroup,
+  Button,
+  Image,
+  Input,
+  Radio,
+  RadioGroup,
+  Textarea,
+  User,
+} from '@nextui-org/react';
+import clsx from 'clsx';
 import { Check, ChevronRight, Dot, Eye, House, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -161,34 +172,70 @@ export default function ArticleCleatePage({
         </div>
       </div>
       <div className="col-span-4 flex flex-col gap-4 lg:gap-6 p-4 border-l dark:border-gray-900 h-full max-h-full overflow-y-auto">
-        <div className="flex gap-2">
-          <Button startContent={<Eye />}>Visualizar</Button>
-          <Button type="submit" startContent={<Check />} color="primary">
-            Salvar
-          </Button>
+        <div className="flex justify-between w-full gap-2">
+          <div>
+            <User
+              name="Publicado por"
+              description="Darlley Brito"
+              avatarProps={{
+                src: 'https://i.pravatar.cc/150?u=a04258114e29026702d',
+              }}
+            />
+          </div>
+          <div className="flex gap-2">
+            <Button startContent={<Eye />}>Visualizar</Button>
+            <Button type="submit" startContent={<Check />} color="primary">
+              Salvar
+            </Button>
+          </div>
         </div>
+
         <div className="flex flex-col gap-4 ">
           <div className="flex flex-col gap-2">
-            <h3>Publicado por</h3>
-            <div>
-              <User
-                name="Jane Doe"
-                description="Product Designer"
-                avatarProps={{
-                  src: 'https://i.pravatar.cc/150?u=a04258114e29026702d',
-                }}
-              />
-            </div>
-          </div>
-          {/* <div className="flex flex-col gap-2">
             <h3>Atualizado por</h3>
             <AvatarGroup isBordered>
               <Avatar src="https://i.pravatar.cc/150?u=a042581f4e29026024d" />
               <Avatar src="https://i.pravatar.cc/150?u=a04258a2462d826712d" />
             </AvatarGroup>
-          </div> */}
+          </div>
         </div>
         <h1>Configurações do artigo</h1>
+        <div className="flex gap-2">
+          <RadioGroup
+            label="Público alvo"
+            description="Selecione para quem o artigo ficará visivel."
+            orientation="horizontal"
+            classNames={{
+              base: 'w-full',
+              wrapper: 'grid w-full grid-cols-2 gap-2',
+            }}
+          >
+            <Radio
+              value="free"
+              classNames={{
+                base: clsx(
+                  'flex m-0 bg-gray-900 hover:border-primary-300 items-center justify-between',
+                  'flex-row-reverse cursor-pointer rounded-lg gap-4 p-4 border-2 border-transparent',
+                  'data-[selected=true]:border-primary col-span-1 !max-w-full'
+                ),
+              }}
+            >
+              Clientes
+            </Radio>
+            <Radio
+              value="interno"
+              classNames={{
+                base: clsx(
+                  'flex m-0 bg-gray-900 hover:border-primary-300 items-center justify-between',
+                  'flex-row-reverse cursor-pointer rounded-lg gap-4 p-4 border-2 border-transparent',
+                  'data-[selected=true]:border-primary col-span-1 !max-w-full'
+                ),
+              }}
+            >
+              Interno
+            </Radio>
+          </RadioGroup>
+        </div>
         <Controller
           name="slug"
           control={control}
