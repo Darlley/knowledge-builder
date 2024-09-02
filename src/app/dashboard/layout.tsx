@@ -30,7 +30,7 @@ export default function layout({ children }: { children: ReactNode }) {
               </div>
 
               <h3 className="text-2xl">
-                Content<span className="text-primary">Flow</span>
+                Knowledge<span className="text-primary">+</span>
               </h3>
             </Link>
           </div>

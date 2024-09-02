@@ -14,6 +14,7 @@ import {
   Input,
   Radio,
   RadioGroup,
+  Switch,
   Textarea,
   User,
 } from '@nextui-org/react';
@@ -24,6 +25,7 @@ import { useRouter } from 'next/navigation';
 import { JSONContent } from 'novel';
 import { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import slugify from 'slugify';
 import { toast } from 'sonner';
 
 const EDITOR_INITIAL_VALUE: JSONContent = {
@@ -66,7 +68,7 @@ export default function ArticleCleatePage({
   const { createPost } = PostsStore();
 
   const [imageUrl, setImageUrl] = useState<null | string>(null);
-  const [value, setValue] = useState<undefined | JSONContent>(
+  const [content, setContent] = useState<undefined | JSONContent>(
     EDITOR_INITIAL_VALUE
   );
 
@@ -74,6 +76,7 @@ export default function ArticleCleatePage({
     control,
     handleSubmit,
     watch,
+    setValue,
     reset,
     formState: { errors, isSubmitting, isLoading },
   } = useForm<PostSchema>({
@@ -82,10 +85,12 @@ export default function ArticleCleatePage({
   });
 
   const onSubmit: SubmitHandler<PostSchema> = async (data) => {
+    return console.log('onSubmit@data', data);
+
     await createPost(user?.id!, siteId, data)
       .then(() => {
-        toast.success('Site criado com sucesso 🎉');
-        router.push('/dashboard/sites');
+        toast.success('Artigo criado com sucesso 🎉');
+        router.push('/dashboard/sites/${siteId}/posts');
       })
       .catch((error) => {
         console.error(error);
@@ -94,7 +99,10 @@ export default function ArticleCleatePage({
   };
 
   return (
-    <form className="overflow-hidden grid grid-cols-12 w-full h-full flex-grow flex-col md:flex-row md:justify-between">
+    <form
+      className="overflow-hidden grid grid-cols-12 w-full h-full flex-grow flex-col md:flex-row md:justify-between"
+      onSubmit={handleSubmit(onSubmit)}
+    >
       <div className="relative col-span-8 flex flex-col h-full max-h-full overflow-y-auto">
         <nav aria-label="Breadcrumb" className="p-4">
           <ol className="flex items-center gap-1 text-sm text-default-400">
@@ -155,7 +163,7 @@ export default function ArticleCleatePage({
                 isRequired={true}
                 placeholder="Escreva um titulo"
                 value={value}
-                onChange={onChange}
+                onValueChange={onChange}
                 isInvalid={!!errors[name]}
                 errorMessage={errors[name]?.message}
               />
@@ -168,12 +176,53 @@ export default function ArticleCleatePage({
           </div>
         </div>
         <div className="flex-grow p-6 max-h-full overflow-y-auto text-sm">
-          <NovelEditor initialValue={value} onChange={setValue} />
+          <NovelEditor initialValue={content} onChange={setContent} />
+
+          {/* <Controller
+            name="title"
+            control={control}
+            render={({ field: { onChange, value, name } }) => (
+              <NovelEditor initialValue={value} onChange={onChange} />
+            )}
+          /> */}
         </div>
       </div>
       <div className="col-span-4 flex flex-col gap-4 lg:gap-6 p-4 border-l dark:border-gray-900 h-full max-h-full overflow-y-auto">
         <div className="flex justify-between w-full gap-2">
-          <div>
+          <div className="flex gap-2">
+            <Button isIconOnly>
+              <Eye />
+            </Button>
+            <Button type="submit" color="primary">
+              Salvar
+            </Button>
+          </div>
+          {/* <ButtonGroup variant="flat">
+            <Button>Rascunho</Button>
+            <Dropdown placement="bottom-end">
+              <DropdownTrigger>
+                <Button isIconOnly>
+                  <ChevronDownIcon />
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Merge options"
+                selectionMode="single"
+                onSelectionChange={console.log}
+                className="max-w-[300px]"
+              >
+                <DropdownItem key="publish">Publicar</DropdownItem>
+                <DropdownItem key="rascunho">Rascunho</DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          </ButtonGroup> */}
+          <Switch color="primary">Publicado</Switch>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <h3>Publicado por</h3>
+          <div className="">
             <User
               name="Publicado por"
               description="Darlley Brito"
@@ -181,12 +230,6 @@ export default function ArticleCleatePage({
                 src: 'https://i.pravatar.cc/150?u=a04258114e29026702d',
               }}
             />
-          </div>
-          <div className="flex gap-2">
-            <Button startContent={<Eye />}>Visualizar</Button>
-            <Button type="submit" startContent={<Check />} color="primary">
-              Salvar
-            </Button>
           </div>
         </div>
 
@@ -252,12 +295,25 @@ export default function ArticleCleatePage({
               placeholder="Slug do artigo"
               description="exemplo: 'artigo-sobre-financas'"
               endContent={
-                <Button size="sm" isIconOnly color="primary" radius="full">
+                <Button
+                  size="sm"
+                  isIconOnly
+                  color="primary"
+                  radius="full"
+                  onClick={() => {
+                    const slug = slugify(watch('title') ?? '', {
+                      lower: true, // Converte para minúsculas
+                      remove: /[*+~.()'"!:@,]/g, // Remove caracteres especiais
+                    });
+
+                    setValue('slug', slug);
+                  }}
+                >
                   <RotateCcw className="size-4 stroke-[1.5]" />
                 </Button>
               }
               value={value}
-              onChange={onChange}
+              onValueChange={onChange}
               isInvalid={!!errors[name]}
               errorMessage={errors[name]?.message}
             />
