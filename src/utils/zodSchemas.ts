@@ -21,7 +21,7 @@ export const postSchema = z.object({
   title: z.string().min(1, "O campo é obrigatório.").max(100, "O campo não pode exceder 100 caracteres.."),
   slug: z.string().min(1, "O campo é obrigatório.").max(200, "O campo não pode exceder 200 caracteres."),
   thumbnail: z.string(),
-  description: z.string().min(1, "O campo é obrigatório.").max(200, "O campo não pode exceder 200 caracteres."),
+  description: z.string().max(200, "O campo não pode exceder 200 caracteres."),
   content: z.string(),
   status: z.enum(["PUBLISHED", "ARCHIVED"]).default("ARCHIVED"),
   audience: z.enum(["CLIENTS", "EMPLOYEES"]).default("CLIENTS"),
