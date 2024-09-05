@@ -21,6 +21,7 @@ import {
   RadioGroup,
   Switch,
   Textarea,
+  Tooltip,
   User,
 } from '@nextui-org/react';
 import clsx from 'clsx';
@@ -31,7 +32,7 @@ import {
   Eye,
   EyeOff,
   House,
-  RotateCcw,
+  Sparkles,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -73,12 +74,13 @@ export default function ArticleCleatePage({
   };
 }) {
   const { id: siteId } = params;
-  const { getUser } = useKindeBrowserClient();
-  const user = getUser();
 
   const router = useRouter();
+  const [isRequestAction, setIsRequestAction] = useState(false);
 
   const { createPost } = PostsStore();
+  const { getUser } = useKindeBrowserClient();
+  const user = getUser();
 
   const [content, setContent] = useState<undefined | JSONContent>(
     EDITOR_INITIAL_VALUE
@@ -90,7 +92,7 @@ export default function ArticleCleatePage({
     watch,
     setValue,
     reset,
-    formState: { errors, isSubmitting, isLoading },
+    formState: { errors },
   } = useForm<PostSchema>({
     resolver: zodResolver(postSchema),
     mode: 'onBlur',
@@ -106,10 +108,14 @@ export default function ArticleCleatePage({
   });
 
   const onSubmit: SubmitHandler<PostSchema> = async (data) => {
-    data.content = JSON.stringify(content);
-    console.log('onSubmit@data', data);
+    setIsRequestAction(true);
 
-    await createPost(user?.id!, siteId, data)
+    data.content = JSON.stringify(content);
+
+    await createPost(siteId, {
+      ...data,
+      userId: user?.id,
+    })
       .then(() => {
         toast.success('Artigo criado com sucesso 🎉');
         router.push(`/dashboard/sites/${siteId}`);
@@ -117,6 +123,7 @@ export default function ArticleCleatePage({
       .catch((error) => {
         console.error(error);
         toast.error('Houve algum erro...');
+        setIsRequestAction(false);
       });
   };
 
@@ -210,7 +217,12 @@ export default function ArticleCleatePage({
           <div className="flex justify-between items-center w-full gap-2">
             <div className="flex gap-2">
               <ButtonGroup variant="flat">
-                <Button type="submit" color="primary">
+                <Button
+                  type="submit"
+                  color="primary"
+                  isLoading={isRequestAction}
+                  isDisabled={isRequestAction}
+                >
                   Salvar
                 </Button>
                 <Dropdown placement="bottom-end">
@@ -343,27 +355,35 @@ export default function ArticleCleatePage({
                     type="text"
                     variant="bordered"
                     label="Slug"
-                    labelPlacement="outside"
                     isRequired={true}
+                    labelPlacement="outside"
                     placeholder="Slug do artigo"
                     description="exemplo: 'artigo-sobre-financas'"
                     endContent={
-                      <Button
-                        size="sm"
-                        isIconOnly
+                      <Tooltip
+                        content="Gerar slug automaticamente"
+                        placement="left"
                         color="primary"
-                        radius="full"
-                        onClick={() => {
-                          const slug = slugify(watch('title') ?? '', {
-                            lower: true, // Converte para minúsculas
-                            remove: /[*+~.()'"!:@,]/g, // Remove caracteres especiais
-                          });
-
-                          setValue('slug', slug);
-                        }}
                       >
-                        <RotateCcw className="size-4 stroke-[1.5]" />
-                      </Button>
+                        <Button
+                          size="sm"
+                          isIconOnly
+                          color="primary"
+                          radius="full"
+                          onClick={() => {
+                            const slug = slugify(watch('title') ?? '', {
+                              lower: true, // Converte para minúsculas
+                              remove: /[*+~.()'"!:@,]/g, // Remove caracteres especiais
+                            });
+
+                            setValue('slug', slug);
+
+                            toast.info('Slug gerado ✨');
+                          }}
+                        >
+                          <Sparkles className="size-4 stroke-[1.5]" />
+                        </Button>
+                      </Tooltip>
                     }
                     value={value}
                     onValueChange={onChange}

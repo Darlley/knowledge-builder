@@ -41,6 +41,7 @@ export async function GET(request: NextRequest) {
 // Função para lidar com a rota POST
 export async function POST(request: NextRequest) {
   const siteId = request.nextUrl.pathname.split('/')[3];
+  const userId = request.nextUrl.pathname.split('/')[3];
 
   const user = requireUser();
 

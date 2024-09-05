@@ -10,7 +10,7 @@ export type PostTypeError = {
 export type PostTypeState = {
   posts: PostType[];
   getPosts: (userId: string, siteId: string) => Promise<void>;
-  createPost: (userId: string, siteId: string, data: Partial<PostType>) => Promise<void>;
+  createPost: (siteId: string, data: Partial<PostType>) => Promise<void>;
 };
 
 const PostsStore = create<PostTypeState>((set, get) => ({
@@ -53,7 +53,7 @@ const PostsStore = create<PostTypeState>((set, get) => ({
     });
   },
 
-  createPost: (userId: string, siteId: string, data: Partial<PostType>) => {
+  createPost: (siteId: string, data: Partial<PostType>) => {
     return new Promise(async (resolve, reject) => {
       try {
         const response = await fetch(`/api/sites/${siteId}/posts`, {

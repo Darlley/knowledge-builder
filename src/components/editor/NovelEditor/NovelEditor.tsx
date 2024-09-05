@@ -25,6 +25,7 @@ export default function NovelEditor({
         className='h-full'
         extensions={extrensions}
         initialContent={initialValue}
+        immediatelyRender={false}
         onUpdate={({ editor }) => {
           const json = editor.getJSON();
           onChange(json);
