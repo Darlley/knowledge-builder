@@ -29,8 +29,8 @@ export default function page({
   const user = getUser();
 
   useEffect(() => {
-    getPosts(user?.id!, siteId)
-      .then(() => {
+    getPosts(user?.id ?? '', siteId)
+    .then(() => {
         setIsRequestAction(false);
       })
       .catch(() => {
@@ -97,7 +97,10 @@ export default function page({
           </Button>
         </div>
       ) : (
+        <>
+        
         <pre>{JSON.stringify(posts, null, 2)}</pre>
+        </>
       )}
     </div>
   );

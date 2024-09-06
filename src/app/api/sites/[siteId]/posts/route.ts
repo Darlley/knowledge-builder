@@ -2,7 +2,6 @@
 import prisma from '@/utils/db';
 import { requireUser } from '@/utils/requireUser';
 import { postSchema } from '@/utils/zodSchemas';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
@@ -10,7 +9,7 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get('userId');
-  const siteId = searchParams.get('siteId');
+  const siteId = request.nextUrl.pathname.split('/')[3];
 
   try {
     const posts = await prisma.post.findMany({
@@ -61,7 +60,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { title, content, description, slug, thumbnail, status, audience } = parsed.data;
+    const { title, content, description, slug, thumbnail, status, audience } =
+      parsed.data;
 
     // Tentar criar o site
     try {

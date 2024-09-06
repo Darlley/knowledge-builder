@@ -20,7 +20,7 @@ const PostsStore = create<PostTypeState>((set, get) => ({
     return new Promise(async (resolve, reject) => {
       try {
         const response = await fetch(
-          `/api/posts?userId=${userId}&siteId=${siteId}`,
+          `/api/sites/${siteId}/posts?userId=${userId}`,
           {
             method: 'GET',
             headers: {
@@ -30,6 +30,7 @@ const PostsStore = create<PostTypeState>((set, get) => ({
         );
 
         if (response.ok) {
+          
           const posts = await response.json();
           set({ posts });
           resolve(posts);
