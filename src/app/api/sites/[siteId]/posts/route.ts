@@ -20,8 +20,11 @@ export async function GET(request: NextRequest) {
       select: {
         thumbnail: true,
         title: true,
-        createdAt: true,
+        status: true,
         id: true,
+        createdAt: true,
+        slug: true,
+        // views: true,
       },
       orderBy: {
         createdAt: 'desc',
