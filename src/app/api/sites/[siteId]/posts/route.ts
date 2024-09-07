@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
         id: true,
         createdAt: true,
         slug: true,
-        // views: true,
+        audience: true,
       },
       orderBy: {
         createdAt: 'desc',

@@ -79,7 +79,7 @@ export default function page() {
               <Card
                 
                 classNames={{
-                  base: 'bg-gray-950 border border-gray-900',
+                  base: 'dark:bg-gray-950 border dark:border-gray-900',
                   footer: 'flex w-full justify-between items-center'
                 }}
               >

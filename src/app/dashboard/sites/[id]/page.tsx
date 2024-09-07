@@ -5,6 +5,7 @@ import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
 import {
   Button,
   ButtonGroup,
+  Chip,
   Image,
   Spinner,
   SwitchProps,
@@ -18,11 +19,11 @@ import {
   useSwitch,
   VisuallyHidden,
 } from '@nextui-org/react';
-import { Cog, Eye, EyeOff, File, Link2, Pen, Plus, Trash } from 'lucide-react';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { Check, CheckCircle, Cog, Eye, EyeOff, File, Link2, Pen, Plus, Trash } from 'lucide-react';
 import moment from 'moment';
 import 'moment/locale/pt-br';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 const columns = [
   {
@@ -38,8 +39,8 @@ const columns = [
     label: 'Status',
   },
   {
-    key: 'views',
-    label: 'Visualizações',
+    key: 'audience',
+    label: 'Publico',
   },
   {
     key: 'created-at',
@@ -141,9 +142,8 @@ export default function page({
           // }
           classNames={{
             base: 'flex-grow h-full text-default-600 overflow-hidden ',
-            wrapper:
-              'flex-grow h-full shadow-none border dark:border-gray-900 rounded-xl overflow-auto dark:bg-gray-950 text-sm',
           }}
+          removeWrapper 
         >
           <TableHeader columns={columns}>
             {(column) => (
@@ -191,7 +191,7 @@ export default function page({
                       src={item?.thumbnail}
                       fallbackSrc={'/default.png'}
                       radius="sm"
-                      className='object-cover'
+                      className="object-cover"
                     />
                   </div>
                 </TableCell>
@@ -203,38 +203,60 @@ export default function page({
                 <TableCell>
                   <div className="flex items-center gap-4">
                     {item?.status == 'PUBLISHED' ? (
-                      <p className="text-green-500 font-bold">Publicado</p>
+                      <Chip
+                        startContent={<CheckCircle className='size-4 stroke-[1.5]' />}
+                        variant="faded"
+                        color="success"
+                        className='dark:bg-green-950 bg-success text-green-100 border-green-500'
+                      >
+                        Publicado
+                      </Chip>
                     ) : (
-                      <p className="text-default-300 font-bold">Rascunho</p>
+                      <Chip variant="dot">
+                        Rascunho
+                      </Chip>
                     )}
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-4">
-                    <p>{item?.views}</p>
+                    {item?.audience == 'CLIENTS' ? (
+                      <Chip
+                        variant="dot"
+                        color="primary"
+                      >
+                        Clientes
+                      </Chip>
+                    ) : (
+                      <Chip variant="dot">
+                        Colaborador
+                      </Chip>
+                    )}
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-4">
-                    <p>{moment(item.createdAt).format('DD/MM/YY')}</p>
+                    {new Intl.DateTimeFormat("pt-BR", {
+                      dateStyle: "medium"
+                    }).format(new Date(item.createdAt))}
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2 w-full justify-start">
-                    <ButtonGroup>
+                    <ButtonGroup fullWidth>
                       <Tooltip content={`Ver artigo`} color="primary">
                         <Button size="sm" isIconOnly>
                           <Link2 className="size-4 stroke-1" />
                         </Button>
                       </Tooltip>
 
-                      <Tooltip content={`Editar artigo`} color="primary">
+                      <Tooltip content={`Editar artigo`} color="warning">
                         <Button size="sm" isIconOnly>
                           <Pen className="size-4 stroke-1" />
                         </Button>
                       </Tooltip>
 
-                      <Tooltip content={`Excluir artigo`} color="primary">
+                      <Tooltip content={`Excluir artigo`} color="danger">
                         <Button size="sm" isIconOnly>
                           <Trash className="size-4 stroke-1" />
                         </Button>
@@ -247,8 +269,6 @@ export default function page({
           </TableBody>
         </Table>
       )}
-
-      {/* <pre>{JSON.stringify(posts, null, 2)}</pre> */}
     </div>
   );
 }
@@ -267,7 +287,7 @@ function ThemeSwitch(props: SwitchProps) {
     <Tooltip
       color="primary"
       size="sm"
-      content={isSelected ? 'Arquivar site' : 'Publicar site'}
+      content={isSelected ? 'Site publicado' : 'Site arquivado'}
       placement="right"
     >
       <div className="flex flex-col gap-2 ">
