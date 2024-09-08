@@ -41,16 +41,12 @@ export async function GET(
         content: true,
         updatedAt: true,
         description: true,
-
-      }
+      },
     });
 
     return NextResponse.json(article, { status: 200 });
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Erro no artigo' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Erro no artigo' }, { status: 500 });
   }
 }
 
@@ -69,13 +65,14 @@ export async function PATCH(
   const articleId = params.articleId;
 
   const user = requireUser();
+  console.log('User:', user);
 
   try {
     const { userId, ...formData } = await request.json();
+    console.log('Form data:', formData);
     const parsed = postSchema.safeParse(formData);
 
     if (!parsed.success) {
-      // Retornar erros de validação Zod
       return NextResponse.json(
         {
           type: 'validation',
@@ -86,12 +83,14 @@ export async function PATCH(
       );
     }
 
-    const { title, content, description, slug, thumbnail, status, audience } =
+    const { title, content, description, slug, thumbnail, status, audience, views } =
       parsed.data;
 
     const article = await prisma.post.update({
       where: {
         id: articleId,
+        siteId,
+        userId, // Certifique-se de que userId está correto
       },
       data: {
         title,
@@ -101,16 +100,23 @@ export async function PATCH(
         thumbnail,
         status,
         audience,
-        views: 0
+        views
       },
     });
 
-    console.log(article)
+    // Convertendo views de BigInt para Number
+    const articleWithConvertedViews = {
+      ...article,
+      views: Number(article.views),
+    };
 
-    return NextResponse.json(article, { status: 200 });
+    console.log('Article updated:', article);
+
+    return NextResponse.json(articleWithConvertedViews, { status: 200 });
   } catch (error) {
+    console.error('Erro no PATCH:', error);
     return NextResponse.json(
-      { error: 'Erro ao listar os sites' },
+      { error: 'Houve um erro ao atualizar o artigo' },
       { status: 500 }
     );
   }

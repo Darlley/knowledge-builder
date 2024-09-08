@@ -20,6 +20,7 @@ import {
   Input,
   Radio,
   RadioGroup,
+  Spinner,
   Switch,
   Textarea,
   Tooltip,
@@ -81,8 +82,9 @@ export default function ArticleCleatePage({
   const articleId = searchParams.get('articleId');
 
   const [isRequestAction, setIsRequestAction] = useState(false);
+  const [isRequestArticleAction, setIsRequestArticleAction] = useState(true);
 
-  const { getPost, createPost } = PostsStore();
+  const { getPost, createPost, editPost } = PostsStore();
   const { getUser } = useKindeBrowserClient();
   const user = getUser();
 
@@ -116,6 +118,24 @@ export default function ArticleCleatePage({
 
     data.content = JSON.stringify(content);
 
+    if (articleId) {
+      await editPost(siteId, articleId, {
+        ...data,
+        userId: user?.id,
+      })
+        .then(() => {
+          toast.success('Artigo editado com sucesso 🎉');
+          router.push(`/dashboard/sites/${siteId}/articles`);
+        })
+        .catch((error) => {
+          console.error(error);
+          toast.error('Houve algum erro...');
+          setIsRequestAction(false);
+        });
+
+      return;
+    }
+
     await createPost(siteId, {
       ...data,
       userId: user?.id,
@@ -141,14 +161,27 @@ export default function ArticleCleatePage({
         postId: articleId!,
         siteId: siteId!,
         userId: user?.id!,
-      }).then((response: PostType) => {
-        console.log("useEffect", response)
-        reset(response);
-      });
+      })
+        .then((response: PostType) => {
+          setIsRequestArticleAction(false);
+          reset(response);
+        })
+        .catch(() => {
+          toast.error(
+            'Lamento pelo erro, se ele persistir fale comigo darlleybrito@gmail.com'
+          );
+          router.push(`/dashboard/sites/${siteId}/articles`);
+        });
+      return;
     }
+    setIsRequestArticleAction(false);
   }, [articleId, user, siteId]);
 
-  return (
+  return isRequestArticleAction ? (
+    <div className="overflow-hidden flex w-full h-full flex-grow flex-col justify-center items-center">
+      <Spinner />
+    </div>
+  ) : (
     <div className="overflow-hidden flex w-full h-full flex-grow flex-col md:flex-row md:justify-between">
       <form
         className="flex h-full w-full"

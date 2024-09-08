@@ -14,6 +14,7 @@ export type PostTypeState = {
   }) => Promise<PostType>;
   getPosts: (userId: string, siteId: string) => Promise<void>;
   createPost: (siteId: string, data: Partial<PostType>) => Promise<void>;
+  editPost: (siteId: string, postId: string, data: Partial<PostType>) => Promise<void>;
 };
 
 const PostsStore = create<PostTypeState>((set, get) => ({
@@ -102,6 +103,40 @@ const PostsStore = create<PostTypeState>((set, get) => ({
       try {
         const response = await fetch(`/api/sites/${siteId}/articles`, {
           method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (response.ok) {
+          resolve();
+        } else {
+          const result = await response.json();
+          const error: PostTypeError = {
+            type: result.type || 'unknownError',
+            message: result.message || 'Erro desconhecido',
+            status: response.status,
+          };
+
+          reject(error);
+        }
+      } catch (err) {
+        const customError: PostTypeError = {
+          type: 'networkError',
+          message: 'Erro de rede ou servidor',
+          status: 500,
+        };
+        reject(customError);
+      }
+    });
+  },
+
+  editPost: (siteId: string, postId: string, data: Partial<PostType>) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const response = await fetch(`/api/sites/${siteId}/articles/${postId}`, {
+          method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
           },

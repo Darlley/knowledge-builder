@@ -98,7 +98,7 @@ export async function POST(
           audience,
           siteId,
           userId,
-          views: 0,
+          views: 0
         },
       });
 
