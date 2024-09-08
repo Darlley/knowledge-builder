@@ -2,6 +2,7 @@
 
 import NovelEditor from '@/components/editor/NovelEditor';
 import PostsStore from '@/stores/PostStore';
+import { PostType } from '@/types/PostType';
 import { UploadDropzone } from '@/utils/uploadthing';
 import { postSchema, PostSchema } from '@/utils/zodSchemas';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -37,7 +38,7 @@ import {
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { JSONContent } from 'novel';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import slugify from 'slugify';
 import { toast } from 'sonner';
@@ -75,13 +76,13 @@ export default function ArticleCleatePage({
 }) {
   const { id: siteId } = params;
 
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const articleId = searchParams.get('articleId')
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const articleId = searchParams.get('articleId');
 
   const [isRequestAction, setIsRequestAction] = useState(false);
 
-  const { createPost } = PostsStore();
+  const { getPost, createPost } = PostsStore();
   const { getUser } = useKindeBrowserClient();
   const user = getUser();
 
@@ -121,7 +122,7 @@ export default function ArticleCleatePage({
     })
       .then(() => {
         toast.success('Artigo criado com sucesso 🎉');
-        router.push(`/dashboard/sites/${siteId}`);
+        router.push(`/dashboard/sites/${siteId}/articles`);
       })
       .catch((error) => {
         console.error(error);
@@ -133,6 +134,19 @@ export default function ArticleCleatePage({
   const onErrors = async (errors: any) => {
     console.log('errors', errors);
   };
+
+  useEffect(() => {
+    if (articleId) {
+      getPost({
+        postId: articleId!,
+        siteId: siteId!,
+        userId: user?.id!,
+      }).then((response: PostType) => {
+        console.log("useEffect", response)
+        reset(response);
+      });
+    }
+  }, [articleId, user, siteId]);
 
   return (
     <div className="overflow-hidden flex w-full h-full flex-grow flex-col md:flex-row md:justify-between">
@@ -179,10 +193,10 @@ export default function ArticleCleatePage({
               </li>
               <li>
                 <Link
-                  href={`/dashboard/sites/${siteId}/posts`}
+                  href={`/dashboard/sites/${siteId}/articles`}
                   className="block transition hover:text-default-300"
                 >
-                  Posts
+                  Publicações
                 </Link>
               </li>
               <li className="rtl:rotate-180">

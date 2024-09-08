@@ -9,6 +9,9 @@ export type PostTypeError = {
 
 export type PostTypeState = {
   posts: PostType[];
+  getPost: (params: {
+    userId: string, siteId: string, postId: string
+  }) => Promise<PostType>;
   getPosts: (userId: string, siteId: string) => Promise<void>;
   createPost: (siteId: string, data: Partial<PostType>) => Promise<void>;
 };
@@ -16,11 +19,51 @@ export type PostTypeState = {
 const PostsStore = create<PostTypeState>((set, get) => ({
   posts: [],
 
+  getPost: async (params: {
+    userId: string, siteId: string, postId: string
+  }) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const response = await fetch(
+          `/api/sites/${params.siteId}/articles/${params.postId}?userId=${params.userId}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        if (response.ok) {
+          
+          const post = await response.json();
+          console.log("getPost", post)
+          resolve(post);
+        } else {
+          const result = await response.json();
+          const error: PostTypeError = {
+            type: result.type || 'unknownError',
+            message: result.message || 'Erro desconhecido',
+            status: response.status,
+          };
+          reject(error);
+        }
+      } catch (err) {
+        const customError: PostTypeError = {
+          type: 'networkError',
+          message: 'Erro de rede ou servidor',
+          status: 500,
+        };
+        reject(customError);
+      }
+    });
+  },
+
   getPosts: async (userId: string, siteId: string) => {
     return new Promise(async (resolve, reject) => {
       try {
         const response = await fetch(
-          `/api/sites/${siteId}/posts?userId=${userId}`,
+          `/api/sites/${siteId}/articles?userId=${userId}`,
           {
             method: 'GET',
             headers: {
@@ -57,7 +100,7 @@ const PostsStore = create<PostTypeState>((set, get) => ({
   createPost: (siteId: string, data: Partial<PostType>) => {
     return new Promise(async (resolve, reject) => {
       try {
-        const response = await fetch(`/api/sites/${siteId}/posts`, {
+        const response = await fetch(`/api/sites/${siteId}/articles`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

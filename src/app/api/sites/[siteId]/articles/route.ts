@@ -4,15 +4,25 @@ import { requireUser } from '@/utils/requireUser';
 import { postSchema } from '@/utils/zodSchemas';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  {
+    params,
+  }: {
+    params: {
+      siteId: string;
+    };
+  }
+) {
+  const siteId = params.siteId;
+
   const user = requireUser();
 
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get('userId');
-  const siteId = request.nextUrl.pathname.split('/')[3];
 
   try {
-    const posts = await prisma.post.findMany({
+    const articles = await prisma.post.findMany({
       where: {
         userId,
         siteId,
@@ -31,7 +41,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(posts, { status: 200 });
+    return NextResponse.json(articles, { status: 200 });
   } catch (error) {
     return NextResponse.json(
       { error: 'Erro ao listar os sites' },
@@ -40,16 +50,26 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// Função para lidar com a rota POST
-export async function POST(request: NextRequest) {
-  const siteId = request.nextUrl.pathname.split('/')[3];
-  const userId = request.nextUrl.pathname.split('/')[3];
+export async function POST(
+  request: NextRequest,
+  {
+    params,
+  }: {
+    params: {
+      siteId: string;
+    };
+  }
+) {
+  const siteId = params.siteId;
+
+  console.log("siteId", siteId)
 
   const user = requireUser();
 
   try {
     const { userId, ...formData } = await request.json();
     const parsed = postSchema.safeParse(formData);
+    console.log("parsed.data", parsed.data)
 
     if (!parsed.success) {
       // Retornar erros de validação Zod
@@ -66,7 +86,6 @@ export async function POST(request: NextRequest) {
     const { title, content, description, slug, thumbnail, status, audience } =
       parsed.data;
 
-    // Tentar criar o site
     try {
       await prisma.post.create({
         data: {
