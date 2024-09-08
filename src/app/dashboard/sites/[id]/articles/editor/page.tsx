@@ -35,7 +35,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { JSONContent } from 'novel';
 import { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
@@ -75,7 +75,10 @@ export default function ArticleCleatePage({
 }) {
   const { id: siteId } = params;
 
-  const router = useRouter();
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const articleId = searchParams.get('articleId')
+
   const [isRequestAction, setIsRequestAction] = useState(false);
 
   const { createPost } = PostsStore();
@@ -169,6 +172,17 @@ export default function ArticleCleatePage({
                   className="block transition hover:text-default-300"
                 >
                   LeadsZapp
+                </Link>
+              </li>
+              <li className="rtl:rotate-180">
+                <ChevronRight className="size-3 stroke-1" />
+              </li>
+              <li>
+                <Link
+                  href={`/dashboard/sites/${siteId}/posts`}
+                  className="block transition hover:text-default-300"
+                >
+                  Posts
                 </Link>
               </li>
               <li className="rtl:rotate-180">
