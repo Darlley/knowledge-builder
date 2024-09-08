@@ -121,3 +121,35 @@ export async function PATCH(
     );
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  {
+    params,
+  }: {
+    params: {
+      siteId: string;
+      articleId: string;
+    };
+  }
+) {
+  const siteId = params.siteId;
+  const articleId = params.articleId;
+
+  const user = requireUser();
+
+  const { searchParams } = new URL(request.url);
+  const userId = searchParams.get('userId');
+
+  try {
+    await prisma.post.delete({
+      where: {
+        id: articleId
+      },
+    });
+
+    return NextResponse.json({ status: 200 });
+  } catch (error) {
+    return NextResponse.json({ error: 'Erro no artigo' }, { status: 500 });
+  }
+}

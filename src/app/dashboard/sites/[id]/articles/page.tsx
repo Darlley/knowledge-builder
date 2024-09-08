@@ -20,7 +20,6 @@ import {
   CheckCircle,
   ChevronLeft,
   Cog,
-  Eye,
   File,
   Link2,
   Pen,
@@ -67,19 +66,26 @@ export default function page({
 }) {
   const { id: siteId } = params;
 
+  const [isOpen, setIsOpen] = useState(false);
   const [isRequestAction, setIsRequestAction] = useState(true);
-  const { posts, getPosts } = PostsStore();
+  const [isDeleteAction, setIsDeleteAction] = useState(false);
+
+  const { posts, getPosts, deletePost } = PostsStore();
   const { getUser } = useKindeBrowserClient();
   const user = getUser();
 
-  useEffect(() => {
-    getPosts(user?.id ?? '', siteId)
+  async function fetchPosts(userId: string, siteId: string) {
+    await getPosts(userId, siteId)
       .then(() => {
         setIsRequestAction(false);
       })
       .catch(() => {
         setIsRequestAction(false);
       });
+  }
+
+  useEffect(() => {
+    fetchPosts(user?.id!, siteId);
   }, [user, siteId]);
 
   const [isClient, setIsClient] = useState(false);
@@ -253,12 +259,49 @@ export default function page({
                       </Tooltip>
 
                       <Tooltip content={`Editar artigo`} color="warning">
-                        <Button size="sm" isIconOnly as={Link} href={`/dashboard/sites/${siteId}/articles/editor?articleId=${item.id}`}>
+                        <Button
+                          size="sm"
+                          isIconOnly
+                          as={Link}
+                          href={`/dashboard/sites/${siteId}/articles/editor?articleId=${item.id}`}
+                        >
                           <Pen className="size-4 stroke-1" />
                         </Button>
                       </Tooltip>
 
-                      <Tooltip content={`Excluir artigo`} color="danger">
+                      <Tooltip
+                        content={
+                          <div className="flex flex-col gap-2 p-4">
+                            <div className="text-sm font-bold">
+                              Tem certeza que deseja excluir?
+                            </div>
+                            <div className="flex">
+                              <Button
+                                color="danger"
+                                size="sm"
+                                isLoading={isDeleteAction}
+                                isDisabled={isDeleteAction}
+                                onClick={async () =>
+                                  new Promise((resolve, reject) => {
+                                    deletePost(siteId, item.id)
+                                      .then(() => {
+                                        fetchPosts(user?.id!, siteId);
+                                        setIsDeleteAction(false);
+                                        resolve();
+                                      })
+                                      .catch(() => {
+                                        setIsDeleteAction(false);
+                                        reject();
+                                      });
+                                  })
+                                }
+                              >
+                                Sim, Excluir.
+                              </Button>
+                            </div>
+                          </div>
+                        }
+                      >
                         <Button size="sm" isIconOnly>
                           <Trash className="size-4 stroke-1" />
                         </Button>
