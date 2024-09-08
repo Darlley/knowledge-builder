@@ -2,6 +2,7 @@
 import prisma from '@/utils/db';
 import { requireUser } from '@/utils/requireUser';
 import { postSchema } from '@/utils/zodSchemas';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
@@ -83,14 +84,43 @@ export async function PATCH(
       );
     }
 
-    const article = await prisma.post.update({
-      where: {
-        id: articleId,
-      },
-      data: parsed.data,
-    });
+    try {
+      const article = await prisma.post.update({
+        where: {
+          id: articleId,
+        },
+        data: parsed.data,
+      });
+      
+      return NextResponse.json(article, { status: 200 });
+    } catch (prismaError) {
+      // Verificar se o erro é uma instância de PrismaClientKnownRequestError
+      if (prismaError instanceof PrismaClientKnownRequestError) {
+        // Tratar erros específicos do Prisma
+        if (prismaError.code === 'P2002') {
+          // Violação de unicidade (subdirectory)
+          return NextResponse.json(
+            {
+              type: 'slugExists',
+              message: 'Slug já existe',
+              status: 400,
+            },
+            { status: 400 }
+          );
+        }
 
-    return NextResponse.json(article, { status: 200 });
+        
+      return NextResponse.json(
+        {
+          type: 'serverError',
+          message: 'Erro ao atualizar o artigo',
+          status: 500,
+        },
+        { status: 500 }
+      );
+      }
+    }
+
   } catch (error) {
     console.error('Erro no PATCH:', error);
     return NextResponse.json(

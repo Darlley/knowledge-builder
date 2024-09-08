@@ -2,6 +2,7 @@
 import prisma from '@/utils/db';
 import { requireUser } from '@/utils/requireUser';
 import { postSchema } from '@/utils/zodSchemas';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
@@ -108,6 +109,21 @@ export async function POST(
       );
     } catch (prismaError) {
       // Outros erros do Prisma
+      if (prismaError instanceof PrismaClientKnownRequestError) {
+
+        if (prismaError.code === 'P2002') {
+          // Violação de unicidade (subdirectory)
+          return NextResponse.json(
+            {
+              type: 'slugExists',
+              message: 'Slug já existe',
+              status: 400,
+            },
+            { status: 400 }
+          );
+        }
+      }
+
       return NextResponse.json(
         {
           type: 'serverError',

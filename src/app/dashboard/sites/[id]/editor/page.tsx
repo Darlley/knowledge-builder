@@ -2,6 +2,7 @@
 
 import NovelEditor from '@/components/editor/NovelEditor';
 import PostsStore from '@/stores/PostStore';
+import { ErrorType } from '@/types/ErrorType';
 import { PostType } from '@/types/PostType';
 import { UploadDropzone } from '@/utils/uploadthing';
 import { postSchema, PostSchema } from '@/utils/zodSchemas';
@@ -98,6 +99,7 @@ export default function ArticleCleatePage({
     handleSubmit,
     watch,
     setValue,
+    setError,
     reset,
     formState: { errors },
   } = useForm<PostSchema>({
@@ -128,9 +130,13 @@ export default function ArticleCleatePage({
           toast.success('Artigo editado com sucesso 🎉');
           router.push(`/dashboard/sites/${siteId}`);
         })
-        .catch((error) => {
+        .catch((error: ErrorType) => {
           console.error(error);
-          toast.error('Houve algum erro...');
+          if (error.type == 'slugExists') {
+            toast.error(error.message);
+          }else{
+            toast.error('Houve algum erro...');
+          }
           setIsRequestAction(false);
         });
 
@@ -147,8 +153,15 @@ export default function ArticleCleatePage({
       })
       .catch((error) => {
         console.error(error);
-        toast.error('Houve algum erro...');
-        setIsRequestAction(false);
+          if (error.type == 'slugExists') {
+            toast.error(error.message);
+            setError('slug', {
+              message: 'Este slug ja esta sendo utilizado'
+            })
+          }else{
+            toast.error('Houve algum erro...');
+          }
+          setIsRequestAction(false);
       });
   };
 
