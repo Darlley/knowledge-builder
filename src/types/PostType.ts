@@ -5,7 +5,6 @@ export type PostType = {
   description: string;
   slug: string;
   thumbnail?: string;
-  views: number;
   status: 'PUBLISHED' | 'ARCHIVED';
   audience: 'CLIENTS' | 'EMPLOYEES';
   createdAt: string;

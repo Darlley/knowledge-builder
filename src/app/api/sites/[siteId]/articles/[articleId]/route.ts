@@ -83,36 +83,14 @@ export async function PATCH(
       );
     }
 
-    const { title, content, description, slug, thumbnail, status, audience, views } =
-      parsed.data;
-
     const article = await prisma.post.update({
       where: {
         id: articleId,
-        siteId,
-        userId, // Certifique-se de que userId está correto
       },
-      data: {
-        title,
-        content,
-        description,
-        slug,
-        thumbnail,
-        status,
-        audience,
-        views
-      },
+      data: parsed.data,
     });
 
-    // Convertendo views de BigInt para Number
-    const articleWithConvertedViews = {
-      ...article,
-      views: Number(article.views),
-    };
-
-    console.log('Article updated:', article);
-
-    return NextResponse.json(articleWithConvertedViews, { status: 200 });
+    return NextResponse.json(article, { status: 200 });
   } catch (error) {
     console.error('Erro no PATCH:', error);
     return NextResponse.json(
@@ -144,7 +122,7 @@ export async function DELETE(
   try {
     await prisma.post.delete({
       where: {
-        id: articleId
+        id: articleId,
       },
     });
 

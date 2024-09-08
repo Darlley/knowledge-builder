@@ -35,6 +35,7 @@ import {
   EyeOff,
   House,
   Sparkles,
+  X,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -125,7 +126,7 @@ export default function ArticleCleatePage({
       })
         .then(() => {
           toast.success('Artigo editado com sucesso 🎉');
-          router.push(`/dashboard/sites/${siteId}/articles`);
+          router.push(`/dashboard/sites/${siteId}`);
         })
         .catch((error) => {
           console.error(error);
@@ -142,7 +143,7 @@ export default function ArticleCleatePage({
     })
       .then(() => {
         toast.success('Artigo criado com sucesso 🎉');
-        router.push(`/dashboard/sites/${siteId}/articles`);
+        router.push(`/dashboard/sites/${siteId}`);
       })
       .catch((error) => {
         console.error(error);
@@ -170,7 +171,7 @@ export default function ArticleCleatePage({
           toast.error(
             'Lamento pelo erro, se ele persistir fale comigo darlleybrito@gmail.com'
           );
-          router.push(`/dashboard/sites/${siteId}/articles`);
+          router.push(`/dashboard/sites/${siteId}`);
         });
       return;
     }
@@ -219,17 +220,6 @@ export default function ArticleCleatePage({
                   className="block transition hover:text-default-300"
                 >
                   LeadsZapp
-                </Link>
-              </li>
-              <li className="rtl:rotate-180">
-                <ChevronRight className="size-3 stroke-1" />
-              </li>
-              <li>
-                <Link
-                  href={`/dashboard/sites/${siteId}/articles`}
-                  className="block transition hover:text-default-300"
-                >
-                  Publicações
                 </Link>
               </li>
               <li className="rtl:rotate-180">
@@ -478,12 +468,25 @@ export default function ArticleCleatePage({
             <div className="flex flex-col gap-1">
               <h3>Escolha imagem de capa</h3>
               {watch('thumbnail') ? (
-                <Image
-                  isBlurred
-                  className="w-full object-cover max-h-[400px]"
-                  src={watch('thumbnail') ?? ''}
-                  alt="Preview da Thumbnail"
-                />
+                <div className="w-full max-h-[400px] relative">
+                  <Image
+                    isBlurred
+                    className=" object-cover "
+                    src={watch('thumbnail') ?? ''}
+                    alt="Preview da Thumbnail"
+                  />
+                  <div className="absolute right-2 top-2 z-10">
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      color="danger"
+                      radius="full"
+                      onClick={() => setValue('thumbnail', '')}
+                    >
+                      <X className="size-4 stroke-1" />
+                    </Button>
+                  </div>
+                </div>
               ) : (
                 <UploadDropzone
                   endpoint="imageUploader"

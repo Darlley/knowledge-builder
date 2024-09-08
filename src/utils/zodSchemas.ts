@@ -25,7 +25,6 @@ export const postSchema = z.object({
   content: z.string(),
   status: z.enum(["PUBLISHED", "ARCHIVED"]).default("ARCHIVED"),
   audience: z.enum(["CLIENTS", "EMPLOYEES"]).default("CLIENTS"),
-  views: z.number().default(0)
 })
 
 export type PostSchema = z.infer<typeof postSchema>;
