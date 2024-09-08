@@ -113,7 +113,7 @@ export default function page({
           <Button
             endContent={<Cog className="stroke-[1.5] size-5" />}
             as={Link}
-            href="#"
+            href={`/dashboard/sites/${siteId}/system`}
           >
             <span>Configurar</span>
           </Button>
