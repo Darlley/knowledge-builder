@@ -134,6 +134,9 @@ export default function ArticleCleatePage({
           console.error(error);
           if (error.type == 'slugExists') {
             toast.error(error.message);
+            setError('slug', {
+              message: 'Este slug ja esta sendo utilizado'
+            })
           }else{
             toast.error('Houve algum erro...');
           }
