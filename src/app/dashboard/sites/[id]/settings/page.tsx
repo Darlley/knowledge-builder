@@ -1,5 +1,14 @@
-import { Button, Card, CardBody, CardFooter, CardHeader, Input, Textarea } from '@nextui-org/react';
-import { ChevronLeft, Cog, Plus, PlusCircle } from 'lucide-react';
+'use client';
+
+import UploadImageForm from '@/components/UploadImageForm';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+} from '@nextui-org/react';
+import { ChevronLeft, Cog, Plus } from 'lucide-react';
 import Link from 'next/link';
 
 export default function page({
@@ -37,20 +46,27 @@ export default function page({
         </div>
       </div>
 
-      <div className='w-full flex gap-4 flex-col'>
-       
-          <Card classNames={{
-            base: 'bg-danger-500/20 border border-danger'
-          }}>
-            <CardHeader>
-              <h3>Ação perigosa</h3>
-            </CardHeader>
-            <CardBody>
-              <p>Você deseja mesmo deletar o site? Esta ação é irreversível e todos os dados serão perdidos.</p>
-            </CardBody>
-            <CardFooter><Button color='danger'>Sim, Desejo Excluir o Site</Button></CardFooter>
-          </Card>
+      <div className="w-full flex gap-4 flex-col">
+        <UploadImageForm onImageUpload={console.log} />
 
+        <Card
+          classNames={{
+            base: 'bg-danger-100 dark:bg-danger-500/10 border border-danger p-4',
+          }}
+        >
+          <CardHeader>
+            <h3 className="text-lg font-semibold">Ação perigosa</h3>
+          </CardHeader>
+          <CardBody>
+            <p>
+              Você deseja mesmo deletar o site? Esta ação é irreversível e todos
+              os dados serão perdidos.
+            </p>
+          </CardBody>
+          <CardFooter>
+            <Button color="danger">Sim, Desejo Excluir o Site</Button>
+          </CardFooter>
+        </Card>
       </div>
     </div>
   );
