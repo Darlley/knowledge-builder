@@ -24,6 +24,7 @@ export type ISiteState = {
   getSite: (siteId: string) => Promise<ISite>; // Modificado para retornar Promise<ISite>
   createSite: (userId: string, data: Partial<ISite>) => Promise<void>;
   updateSite: (siteId: string, userId: string, data: Partial<ISite>) => Promise<void>;
+  deleteSite: (siteId: string, userId: string) => Promise<void>;
 };
 
 const SiteStore = create<ISiteState>((set, get) => ({
@@ -170,6 +171,30 @@ const SiteStore = create<ISiteState>((set, get) => ({
         reject(customError);
       }
     });
+  },
+
+  deleteSite: async (siteId: string, userId: string) => {
+    try {
+      const response = await fetch(`/api/sites/${siteId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Falha ao excluir o site');
+      }
+
+      // Atualiza o estado removendo o site excluído
+      set((state) => ({
+        sites: state.sites.filter((site) => site.id !== siteId),
+      }));
+    } catch (error) {
+      console.error('Erro ao excluir o site:', error);
+      throw error;
+    }
   },
 }));
 

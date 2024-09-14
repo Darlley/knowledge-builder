@@ -124,3 +124,67 @@ export async function PATCH(
     );
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { siteId: string } }
+) {
+  const siteId = params.siteId;
+
+  try {
+    const { userId } = await request.json();
+
+    if (!userId) {
+      return NextResponse.json(
+        {
+          type: 'unauthorized',
+          message: 'Usuário não autenticado',
+          status: 401,
+        },
+        { status: 401 }
+      );
+    }
+
+    const site = await prisma.site.findUnique({
+      where: {
+        id: siteId,
+        userId: userId,
+      },
+    });
+
+    if (!site) {
+      return NextResponse.json(
+        {
+          type: 'notFound',
+          message: 'Site não encontrado ou não pertence ao usuário',
+          status: 404,
+        },
+        { status: 404 }
+      );
+    }
+
+    await prisma.site.delete({
+      where: {
+        id: siteId,
+      },
+    });
+
+    return NextResponse.json(
+      {
+        message: 'Site excluído com sucesso',
+        status: 200,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Erro ao excluir o site:', error);
+    return NextResponse.json(
+      {
+        type: 'serverError',
+        message: 'Erro ao excluir o site',
+        status: 500,
+      },
+      { status: 500 }
+    );
+  }
+}
