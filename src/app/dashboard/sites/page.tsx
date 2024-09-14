@@ -51,7 +51,7 @@ export default function page() {
             <Link key={site?.id} href={`/dashboard/sites/${site?.id}`}>
               <Card
                 classNames={{
-                  base: 'dark:bg-gray-950 border dark:border-gray-900',
+                  base: 'dark:bg-gray-950 border dark:border-gray-900 h-[400px]',
                   footer: 'flex w-full justify-between items-center',
                 }}
               >
@@ -60,12 +60,13 @@ export default function page() {
                     src={site.imageUrl || '/default.png'}
                     fallbackSrc="/default.png"
                     alt="NextUI Image with fallback"
+                    className='object-cover h-full'
                   />
                 </CardHeader>
                 <CardBody>
-                  <div>
-                    <h3 className="text-lg font-bold">{site.name}</h3>
-                    <p>{site.description}</p>
+                  <div className='mt-auto'>
+                    <h3 className="text-lg font-bold truncate">{site.name}</h3>
+                    <p className="line-clamp-1">{site.description}</p>
                   </div>
                 </CardBody>
                 <CardFooter>
