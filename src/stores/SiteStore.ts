@@ -109,29 +109,19 @@ const SiteStore = create<ISiteState>((set, get) => ({
           body: JSON.stringify({userId, ...data}),
         });
 
+        const result = await response.json();
+
         if (response.ok) {
-
-          resolve();
-
+          resolve(result);
         } else {
-
-          const result = await response.json();
-          const error: ISiteError = {
-            type: result.type || 'unknownError',
-            message: result.message || 'Erro desconhecido',
-            status: response.status,
-          };
-
-          reject(error);
-
+          reject(result); // Propaga o erro completo retornado pela API
         }
       } catch (err) {
-        const customError: ISiteError = {
+        reject({
           type: 'networkError',
           message: 'Erro de rede ou servidor',
-          status: 500,
-        };
-        reject(customError);
+          error: err
+        });
       }
     });
   },

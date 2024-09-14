@@ -22,6 +22,7 @@ export default function page() {
     handleSubmit,
     watch,
     reset,
+    setError,
     formState: { errors, isSubmitting, isLoading },
   } = useForm<SiteSchema>({
     resolver: zodResolver(siteSchema),
@@ -34,20 +35,40 @@ export default function page() {
       return;
     }
 
-    await createSite(user?.id, data)
-      .then(() => {
-        toast.success('Site criado com sucesso 🎉');
-        router.push('/dashboard/sites');
-      })
-      .catch((error) => {
-        // Tratamento de erros específicos
-        if (error.type === 'directoryExists') {
-          toast.error('Subdiretório já existe');
+    try {
+      await createSite(user?.id, data);
+      toast.success('Site criado com sucesso 🎉');
+      router.push('/dashboard/sites');
+    } catch (error: any) {
+      console.error('Erro ao criar site:', error); // Para depuração
+
+      if (error.type === 'validationError') {
+        if (Array.isArray(error.errors)) {
+          error.errors.forEach((err: { field: string; message: string }) => {
+            setError(err.field as keyof SiteSchema, {
+              type: 'manual',
+              message: err.message
+            });
+          });
+        } else if (typeof error.error === 'object') {
+          Object.entries(error.error).forEach(([field, message]) => {
+            setError(field as keyof SiteSchema, {
+              type: 'manual',
+              message: message as string
+            });
+          });
         } else {
-          // Lidar com outros erros
-          toast.error('Houve algum erro...');
+          // Se não conseguirmos extrair erros específicos, definimos um erro genérico
+          setError('root', {
+            type: 'manual',
+            message: 'Ocorreu um erro de validação. Por favor, verifique os campos.'
+          });
         }
-      });
+        toast.error('Por favor, corrija os erros no formulário.');
+      } else {
+        toast.error(error.message || 'Houve um erro ao criar o site. Por favor, tente novamente.');
+      }
+    }
   };
 
   return (
@@ -101,14 +122,15 @@ export default function page() {
               render={({ field: { onChange, value, name } }) => (
                 <Input
                   type="text"
-                  label="Subdiretorio"
+                  label="Subdiretório"
                   variant="bordered"
                   className="text-default-400"
                   isRequired
                   value={value}
-                  onChange={onChange}
+                  onChange={(e) => onChange(e.target.value.toLowerCase())}
                   isInvalid={!!errors[name]}
                   errorMessage={errors[name]?.message}
+                  description="Use apenas letras minúsculas, sem espaços ou caracteres especiais."
                 />
               )}
             />
