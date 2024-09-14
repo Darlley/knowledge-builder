@@ -1,32 +1,48 @@
 // src/app/api/create-site/route.ts
 import prisma from '@/utils/db';
-import { siteSchema } from '@/utils/zodSchemas';
-import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
+import { requireUser } from '@/utils/requireUser';
+import { postSchema } from '@/utils/zodSchemas';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest) {
-  const { getUser } = getKindeServerSession(); // Substitua pela forma correta de obter o usuário
-  const user = await getUser();
-
-  if (!user) {
-    return NextResponse.redirect('/api/auth/login');
+export async function GET(
+  request: NextRequest,
+  {
+    params,
+  }: {
+    params: {
+      siteId: string;
+    };
   }
+) {
+  const siteId = params.siteId;
+
+  const user = requireUser();
 
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get('userId');
 
   try {
-    const sites = await prisma.site.findMany({
+    const articles = await prisma.post.findMany({
       where: {
-        userId
+        userId,
+        siteId,
+      },
+      select: {
+        thumbnail: true,
+        title: true,
+        status: true,
+        id: true,
+        createdAt: true,
+        slug: true,
+        audience: true,
       },
       orderBy: {
         createdAt: 'desc',
       },
     });
 
-    return NextResponse.json(sites, { status: 200 });
+    return NextResponse.json(articles, { status: 200 });
   } catch (error) {
     return NextResponse.json(
       { error: 'Erro ao listar os sites' },
@@ -35,17 +51,26 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: Request) {
-  const { getUser } = getKindeServerSession(); // Substitua pela forma correta de obter o usuário
-  const user = await getUser();
-
-  if (!user) {
-    return NextResponse.redirect('/api/auth/login');
+export async function POST(
+  request: NextRequest,
+  {
+    params,
+  }: {
+    params: {
+      siteId: string;
+    };
   }
+) {
+  const siteId = params.siteId;
+
+  console.log("siteId", siteId)
+
+  const user = requireUser();
 
   try {
-    const {userId, ...formData} = await request.json();
-    const parsed = siteSchema.safeParse(formData);
+    const { userId, ...formData } = await request.json();
+    const parsed = postSchema.safeParse(formData);
+    console.log("parsed.data", parsed.data)
 
     if (!parsed.success) {
       // Retornar erros de validação Zod
@@ -59,34 +84,39 @@ export async function POST(request: Request) {
       );
     }
 
-    const { name, description, subdirectory } = parsed.data;
+    const { title, content, description, slug, thumbnail, status, audience } =
+      parsed.data;
 
-    // Tentar criar o site
     try {
-      await prisma.site.create({
+      await prisma.post.create({
         data: {
-          name,
+          title,
+          content: JSON.stringify(content),
           description,
-          subdirectory,
+          slug,
+          thumbnail,
+          status,
+          audience,
+          siteId,
           userId
         },
       });
 
       // Retornar sucesso
       return NextResponse.json(
-        { message: 'Site criado com sucesso' },
+        { message: 'Artigo criado com sucesso.' },
         { status: 200 }
       );
     } catch (prismaError) {
-      // Verificar se o erro é uma instância de PrismaClientKnownRequestError
+      // Outros erros do Prisma
       if (prismaError instanceof PrismaClientKnownRequestError) {
-        // Tratar erros específicos do Prisma
+
         if (prismaError.code === 'P2002') {
           // Violação de unicidade (subdirectory)
           return NextResponse.json(
             {
-              type: 'directoryExists',
-              message: 'Subdiretório já existe',
+              type: 'slugExists',
+              message: 'Slug já existe',
               status: 400,
             },
             { status: 400 }
@@ -94,18 +124,16 @@ export async function POST(request: Request) {
         }
       }
 
-      // Outros erros do Prisma
       return NextResponse.json(
         {
           type: 'serverError',
-          message: 'Erro ao criar o site',
+          message: 'Erro ao criar o artigo',
           status: 500,
         },
         { status: 500 }
       );
     }
   } catch (error) {
-    // Erro inesperado
     return NextResponse.json(
       {
         type: 'serverError',

@@ -20,24 +20,25 @@ import { useEffect, useState } from 'react';
 import SiteStore from '@/stores/SiteStore';
 
 export default function page() {
-  const [isRequestAction, setIsRequestAction] = useState(true);
+  const [isRequestAction, setIsRequestAction] = useState(false);
   const { sites, getSites } = SiteStore();
   const { getUser } = useKindeBrowserClient();
   const user = getUser();
 
   useEffect(() => {
-    getSites()
+    setIsRequestAction(true);
+    getSites(user?.id! as string)
       .then(() => {
         setIsRequestAction(false);
       })
       .catch(() => {
         setIsRequestAction(false);
       });
-  }, []);
+  }, [user]);
 
   return (
-    <>
-      <div className="flex w-full justify-end ">
+    <div className="flex flex-1 flex-col gap-4 lg:gap-6 p-4 lg:p-6">
+      <div className="flex w-full justify-end">
         <Button
           endContent={<Plus />}
           color="primary"
@@ -50,7 +51,49 @@ export default function page() {
 
       {isRequestAction ? (
         <Spinner label="Buscando seus sites..." />
-      ) : !sites?.length ? (
+      ) : sites?.length > 0 ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {sites.map((site) => (
+            <Link key={site?.id} href={`/dashboard/sites/${site?.id}`}>
+              <Card
+                classNames={{
+                  base: 'dark:bg-gray-950 border dark:border-gray-900',
+                  footer: 'flex w-full justify-between items-center',
+                }}
+              >
+                <CardHeader>
+                  <Image
+                    src={site.imageUrl || '/default.png'}
+                    fallbackSrc="/default.png"
+                    alt="NextUI Image with fallback"
+                  />
+                </CardHeader>
+                <CardBody>
+                  <div>
+                    <h3 className="text-lg font-bold">{site.name}</h3>
+                    <p>{site.description}</p>
+                  </div>
+                </CardBody>
+                <CardFooter>
+                  <div>
+                    <User
+                      name={user?.given_name}
+                      avatarProps={{
+                        src: user?.picture!,
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <p className="text-xs">
+                      {moment(site.createdAt).format('DD [de] MMMM [de] YYYY')}
+                    </p>
+                  </div>
+                </CardFooter>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      ) : (
         <div className="flex flex-col items-center justify-center rounded-md border border-dashed dark:border-gray-900 p-8 text-center animate-in fade-in-50">
           <div className="p-2 flex items-center justify-center rounded-full size-20 bg-primary-100 dark:bg-none">
             <File className="size-10 stroke-primary-500" />
@@ -72,52 +115,7 @@ export default function page() {
             Criar site
           </Button>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {sites.map((site) => (
-            <Link key={site?.id} href={`/dashboard/sites/${site?.id}`}>
-              <Card
-                
-                classNames={{
-                  base: 'bg-gray-950 border border-gray-900',
-                  footer: 'flex w-full justify-between items-center'
-                }}
-              >
-                <CardHeader>
-                  <Image
-                    src="/default.png"
-                    fallbackSrc="/default.png"
-                    alt="NextUI Image with fallback"
-                  />
-                </CardHeader>
-                <CardBody>
-                  <div>
-                    <h3 className='text-lg font-bold'>
-                      {site.name}
-                    </h3>
-                    <p>{site.description}</p>
-                  </div>
-                </CardBody>
-                <CardFooter>
-                  <div>
-                    <User
-                      name={user?.given_name}
-                      avatarProps={{
-                        src: user?.picture!,
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <p className='text-xs'>
-                      {moment(site.createdAt).format('DD [de] MMMM [de] YYYY')}
-                    </p>
-                  </div>
-                </CardFooter>
-              </Card>
-            </Link>
-          ))}
-        </div>
       )}
-    </>
+    </div>
   );
 }
