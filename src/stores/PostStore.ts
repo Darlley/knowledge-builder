@@ -9,11 +9,10 @@ export type PostTypeError = {
 
 export type PostTypeState = {
   posts: PostType[];
+  recentPosts: PostType[];
   isLoading: boolean;
-  getPost: (params: {
-    userId: string, siteId: string, postId: string
-  }) => Promise<PostType>;
   getPosts: (userId: string, siteId: string) => Promise<void>;
+  getRecentPosts: (userId: string, limit?: number) => Promise<void>;
   createPost: (siteId: string, data: Partial<PostType>) => Promise<PostType>;
   editPost: (siteId: string, postId: string, data: Partial<PostType>) => Promise<PostType>;
   deletePost: (siteId: string, postId: string) => Promise<void>;
@@ -21,35 +20,8 @@ export type PostTypeState = {
 
 const PostsStore = create<PostTypeState>((set, get) => ({
   posts: [],
+  recentPosts: [],
   isLoading: false,
-
-  getPost: async (params: {
-    userId: string, siteId: string, postId: string
-  }) => {
-    set({ isLoading: true });
-    try {
-      const response = await fetch(
-        `/api/sites/${params.siteId}/articles/${params.postId}?userId=${params.userId}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw await response.json();
-      }
-
-      const post = await response.json();
-      set({ isLoading: false });
-      return post;
-    } catch (error) {
-      set({ isLoading: false });
-      throw error;
-    }
-  },
 
   getPosts: async (userId: string, siteId: string) => {
     set({ isLoading: true });
@@ -70,6 +42,31 @@ const PostsStore = create<PostTypeState>((set, get) => ({
 
       const posts = await response.json();
       set({ posts, isLoading: false });
+    } catch (error) {
+      set({ isLoading: false });
+      throw error;
+    }
+  },
+
+  getRecentPosts: async (userId: string, limit = 5) => {
+    set({ isLoading: true });
+    try {
+      const response = await fetch(
+        `/api/sites/recent/articles?userId=${userId}&limit=${limit}&recent=true`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw await response.json();
+      }
+
+      const recentPosts = await response.json();
+      set({ recentPosts, isLoading: false });
     } catch (error) {
       set({ isLoading: false });
       throw error;
