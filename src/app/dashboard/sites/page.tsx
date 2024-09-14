@@ -63,7 +63,7 @@ export default function page() {
               >
                 <CardHeader>
                   <Image
-                    src="/default.png"
+                    src={site.imageUrl || '/default.png'}
                     fallbackSrc="/default.png"
                     alt="NextUI Image with fallback"
                   />

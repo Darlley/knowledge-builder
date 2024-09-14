@@ -14,64 +14,40 @@ import {
   Textarea,
 } from '@nextui-org/react';
 import { Save } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { UploadSiteFormProps } from './UploadSiteForm.types';
 
-export default function UploadSiteForm({ siteId }: UploadSiteFormProps) {
+export default function UploadSiteForm({ site }: UploadSiteFormProps) {
   const { getUser } = useKindeBrowserClient();
   const user = getUser();
 
-  const { getSite, updateSite } = SiteStore();
-  const [isLoading, setIsLoading] = useState(true);
+  const { updateSite } = SiteStore();
 
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-    reset,
   } = useForm<SiteSchema>({
     resolver: zodResolver(siteSchema),
     mode: 'onBlur',
+    defaultValues: {
+      name: site.name || '',
+      subdirectory: site.subdirectory || '',
+      description: site.description || '',
+    },
   });
-
-  useEffect(() => {
-    const fetchSite = async () => {
-      try {
-        const site = await getSite(siteId);
-        if (site) {
-          reset({
-            name: site?.name || '',
-            subdirectory: site.subdirectory || '',
-            description: site.description || '',
-          });
-        } else {
-          throw new Error('Site não encontrado');
-        }
-      } catch (error) {
-        console.error('Erro ao buscar informações do site:', error);
-        toast.error('Erro ao carregar informações do site');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchSite();
-  }, [siteId, getSite, reset]);
 
   const onSubmit: SubmitHandler<SiteSchema> = async (data) => {
     try {
-      await updateSite(siteId, user?.id!, data);
+      if (!user?.id) throw new Error('Usuário não autenticado');
+      await updateSite(site.id, user.id, data);
       toast.success('Site atualizado com sucesso');
     } catch (error) {
+      console.error('Erro ao atualizar o site:', error);
       toast.error('Erro ao atualizar o site');
     }
   };
-
-  if (isLoading) {
-    return <div>Carregando...</div>;
-  }
 
   return (
     <Card className="w-full p-4 shadow-none dark:bg-gray-950 border dark:border-gray-900">

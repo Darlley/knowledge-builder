@@ -1,3 +1,5 @@
+import { ISite } from "@/stores/SiteStore";
+
 export interface UploadSiteFormProps {
-  siteId: string;
+  site: ISite;
 }

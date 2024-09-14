@@ -1,6 +1,7 @@
 'use client';
 
 import { UploadDropzone } from '@/utils/uploadthing';
+import SiteStore from '@/stores/SiteStore';
 import {
   Button,
   Card,
@@ -9,19 +10,24 @@ import {
   CardHeader,
   Image,
 } from '@nextui-org/react';
-import { Check, Save, X } from 'lucide-react';
-import { useState } from 'react';
+import { Save, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
 import { UploadImageFormProps } from './UploadImageForm.types';
 
-export default function UploadImageForm({
-  onImageUpload,
-}: UploadImageFormProps) {
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+export default function UploadImageForm({ site }: UploadImageFormProps) {
+  const [imageUrl, setImageUrl] = useState<string | null>(site.imageUrl || null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { updateSite } = SiteStore();
+  const { user } = useKindeBrowserClient();
+
+  useEffect(() => {
+    setImageUrl(site.imageUrl || null);
+  }, [site.imageUrl]);
 
   const handleUploadComplete = (res: { url: string }[]) => {
     setImageUrl(res[0].url);
-    onImageUpload(res[0].url);
   };
 
   const handleUploadError = () => {
@@ -30,7 +36,22 @@ export default function UploadImageForm({
 
   const handleRemoveImage = () => {
     setImageUrl(null);
-    onImageUpload(null);
+  };
+
+  const handleSaveChanges = async () => {
+    if (user?.id) {
+      setIsLoading(true);
+      try {
+        if(imageUrl){
+          await updateSite(site.id, user.id, { ...site, imageUrl });
+        }
+        toast.success('Imagem do site atualizada com sucesso');
+      } catch (error) {
+        toast.error('Erro ao atualizar a imagem do site');
+      } finally {
+        setIsLoading(false);
+      }
+    }
   };
 
   return (
@@ -46,15 +67,15 @@ export default function UploadImageForm({
               alt="Imagem do site"
               className="w-full size-[200px] object-cover rounded-lg"
             />
-              <Button
-                isIconOnly
-                size="sm"
-                color="danger"
-                className="absolute top-2 right-2 z-10 flex gap-2"
-                onClick={handleRemoveImage}
-              >
-                <X className="w-4 h-4" />
-              </Button>
+            <Button
+              isIconOnly
+              size="sm"
+              color="danger"
+              className="absolute top-2 right-2 z-10 flex gap-2"
+              onClick={handleRemoveImage}
+            >
+              <X className="w-4 h-4" />
+            </Button>
           </div>
         ) : (
           <UploadDropzone
@@ -74,8 +95,11 @@ export default function UploadImageForm({
         <div>
           <Button
             color="primary"
-            type="submit"
+            type="button"
             endContent={<Save className="stroke-[1.5] size-5" />}
+            onClick={handleSaveChanges}
+            isLoading={isLoading}
+            isDisabled={!user?.id}
           >
             Salvar alterações
           </Button>

@@ -1,13 +1,14 @@
-import { NextRequest, NextResponse } from "next/server";
 import prisma from '@/utils/db';
-import { siteSchema } from '@/utils/zodSchemas';
 import { requireUser } from '@/utils/requireUser';
+import { siteSchema } from '@/utils/zodSchemas';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(req: NextRequest, { params }: { params: { siteId: string } }) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { siteId: string } }
+) {
   const { siteId } = params;
-
-  
 
   try {
     const site = await prisma.site.findUnique({
@@ -19,10 +20,11 @@ export async function GET(req: NextRequest, { params }: { params: { siteId: stri
         name: true,
         subdirectory: true,
         description: true,
+        imageUrl: true,
         userId: true,
         createdAt: true,
         updatedAt: true,
-      }
+      },
     });
 
     if (!site) {
@@ -86,7 +88,7 @@ export async function PATCH(
         },
         data: parsed.data,
       });
-      
+
       return NextResponse.json(site, { status: 200 });
     } catch (prismaError) {
       if (prismaError instanceof PrismaClientKnownRequestError) {
@@ -101,7 +103,7 @@ export async function PATCH(
           );
         }
       }
-      
+
       return NextResponse.json(
         {
           type: 'serverError',

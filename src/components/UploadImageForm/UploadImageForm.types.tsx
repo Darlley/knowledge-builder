@@ -1,3 +1,5 @@
+import { ISite } from "@/stores/SiteStore";
+
 export interface UploadImageFormProps {
-  onImageUpload: (imageUrl: string | null) => void;
+  site: ISite
 }

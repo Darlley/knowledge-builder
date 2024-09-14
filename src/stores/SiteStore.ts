@@ -133,6 +133,7 @@ const SiteStore = create<ISiteState>((set, get) => ({
   },
 
   updateSite: (siteId: string, userId: string, data: Partial<ISite>) => {
+    console.log(data);
     return new Promise(async (resolve, reject) => {
       try {
         const response = await fetch(`/api/sites/${siteId}`, {
