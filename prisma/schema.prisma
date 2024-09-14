@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String   @id @unique
+  name         String
+  firstName    String
+  lastName     String
+  email        String   @unique
+  profileImage String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
+  posts        Post[]
+  Site         Site[]
+}
+
+model Site {
+  id           String   @id @default(uuid())
+  name         String
+  description  String
+  subdirectory String   @unique
+  imageUrl     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
+  userId       String?
+  posts        Post[]
+  User         User?    @relation(fields: [userId], references: [id])
+}
+
+model Post {
+  id          String          @id @default(uuid())
+  title       String
+  content     Json
+  description String
+  slug        String          @unique
+  thumbnail   String
+  status      ArticleStatus
+  audience    ArticleAudience
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @default(now())
+  userId      String?
+  siteId      String?
+  Site        Site?           @relation(fields: [siteId], references: [id])
+  User        User?           @relation(fields: [userId], references: [id])
+}
+
+enum UserRole {
+  OWNER
+  ADMIN
+  EDITOR
+}
+
+enum ArticleStatus {
+  PUBLISHED
+  ARCHIVED
+}
+
+enum ArticleAudience {
+  CLIENTS
+  EMPLOYEES
+}
