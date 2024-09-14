@@ -57,7 +57,7 @@ const columns = [
   },
 ];
 
-export default function page({
+export default function Page({
   params,
 }: {
   params: {
@@ -66,26 +66,17 @@ export default function page({
 }) {
   const { id: siteId } = params;
 
-  const [isRequestAction, setIsRequestAction] = useState(true);
-  const [isDeleteAction, setIsDeleteAction] = useState(false);
-
-  const { posts, getPosts, deletePost } = PostsStore();
+  const { posts, isLoading, getPosts, deletePost } = PostsStore();
   const { getUser } = useKindeBrowserClient();
   const user = getUser();
 
-  async function fetchPosts(userId: string, siteId: string) {
-    await getPosts(userId, siteId)
-      .then(() => {
-        setIsRequestAction(false);
-      })
-      .catch(() => {
-        setIsRequestAction(false);
-      });
-  }
+  const [isDeleteAction, setIsDeleteAction] = useState(false);
 
   useEffect(() => {
-    fetchPosts(user?.id!, siteId);
-  }, [user, siteId]);
+    if (user?.id) {
+      getPosts(user.id, siteId);
+    }
+  }, [user, siteId, getPosts]);
 
   const [isClient, setIsClient] = useState(false);
 
@@ -130,28 +121,9 @@ export default function page({
 
       {isClient && (
         <Table
-          aria-label="Controlled table example with dynamic content"
+          aria-label="Tabela de artigos"
           fullWidth
-          // selectionMode="multiple"
           disableAnimation
-          // selectedKeys={selectedRows}
-          // onSelectionChange={setSelectedRows}
-          topContentPlacement="outside"
-          bottomContentPlacement="outside"
-          // bottomContent={
-          //   <div className="flex items-center justify-end px-2 w-full">
-          //     <span
-          //       className={clsx(
-          //         'text-small text-default-400',
-          //         selectedRows === 'all' ? 'font-bold' : ''
-          //       )}
-          //     >
-          //       {selectedRows === 'all'
-          //         ? `Todos foram selecionados`
-          //         : `${selectedRows.size} de ${contacts.length} selecionados`}
-          //     </span>
-          //   </div>
-          // }
           classNames={{
             base: 'flex-grow h-full text-default-600 overflow-hidden ',
           }}
@@ -166,7 +138,7 @@ export default function page({
           </TableHeader>
           <TableBody
             items={posts}
-            isLoading={isRequestAction}
+            isLoading={isLoading}
             loadingContent={<Spinner label="Buscando suas publicações..." />}
             emptyContent={
               <div className="flex flex-col items-center justify-center rounded-md border border-dashed dark:border-gray-900 p-8 text-center animate-in fade-in-50">
@@ -177,8 +149,7 @@ export default function page({
                   Você não criou nenhuma postagem para o seu site
                 </h2>
                 <p className="mt-2 mb-8 text-center text-sm leading-tight text-default-400 max-w-sm">
-                  You currently dont have any sites. Please create some so that
-                  you can see them right here!
+                  Você ainda não tem nenhuma publicação. Crie uma agora para vê-la aqui!
                 </p>
 
                 <Button
@@ -280,20 +251,16 @@ export default function page({
                                 size="sm"
                                 isLoading={isDeleteAction}
                                 isDisabled={isDeleteAction}
-                                onClick={async () =>
-                                  new Promise((resolve, reject) => {
-                                    deletePost(siteId, item.id)
-                                      .then(() => {
-                                        fetchPosts(user?.id!, siteId);
-                                        setIsDeleteAction(false);
-                                        resolve();
-                                      })
-                                      .catch(() => {
-                                        setIsDeleteAction(false);
-                                        reject();
-                                      });
-                                  })
-                                }
+                                onClick={async () => {
+                                  setIsDeleteAction(true);
+                                  try {
+                                    await deletePost(siteId, item.id);
+                                  } catch (error) {
+                                    console.error('Erro ao excluir post:', error);
+                                  } finally {
+                                    setIsDeleteAction(false);
+                                  }
+                                }}
                               >
                                 Sim, Excluir.
                               </Button>

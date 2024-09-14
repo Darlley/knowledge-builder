@@ -20,6 +20,7 @@ export type ISiteError = {
 export type ISiteState = {
   sites: ISite[];
   currentSite: ISite | null;
+  isLoading: boolean;
   getSites: (userId: string) => Promise<void>;
   getSite: (siteId: string) => Promise<ISite>; // Modificado para retornar Promise<ISite>
   createSite: (userId: string, data: Partial<ISite>) => Promise<void>;
@@ -30,8 +31,10 @@ export type ISiteState = {
 const SiteStore = create<ISiteState>((set, get) => ({
   sites: [],
   currentSite: null,
+  isLoading: false,
 
   getSites: async (userId: string) => {
+    set({ isLoading: true });
     return new Promise(async (resolve, reject) => {
       try {
         const response = await fetch(`/api/sites?userId=${userId}`, {
@@ -43,7 +46,7 @@ const SiteStore = create<ISiteState>((set, get) => ({
 
         if (response.ok) {
           const sites = await response.json();
-          set({ sites });
+          set({ sites, isLoading: false });
           resolve(sites);
         } else {
           const result = await response.json();

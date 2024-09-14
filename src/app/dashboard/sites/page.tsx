@@ -20,21 +20,15 @@ import { useEffect, useState } from 'react';
 import SiteStore from '@/stores/SiteStore';
 
 export default function page() {
-  const [isRequestAction, setIsRequestAction] = useState(false);
-  const { sites, getSites } = SiteStore();
+  const { sites, getSites, isLoading } = SiteStore();
   const { getUser } = useKindeBrowserClient();
   const user = getUser();
 
   useEffect(() => {
-    setIsRequestAction(true);
-    getSites(user?.id! as string)
-      .then(() => {
-        setIsRequestAction(false);
-      })
-      .catch(() => {
-        setIsRequestAction(false);
-      });
-  }, [user]);
+    if (user?.id) {
+      getSites(user.id);
+    }
+  }, [user, getSites]);
 
   return (
     <div className="flex flex-1 flex-col gap-4 lg:gap-6 p-4 lg:p-6">
@@ -49,7 +43,7 @@ export default function page() {
         </Button>
       </div>
 
-      {isRequestAction ? (
+      {isLoading ? (
         <Spinner label="Buscando seus sites..." />
       ) : sites?.length > 0 ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
