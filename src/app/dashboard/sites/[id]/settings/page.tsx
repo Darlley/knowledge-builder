@@ -1,6 +1,5 @@
 'use client';
 
-import UploadImageForm from '@/components/UploadImageForm/UploadImageForm';
 import UploadSiteForm from '@/components/UploadSiteForm/UploadSiteForm';
 import SiteStore, { ISite } from '@/stores/SiteStore';
 import {
@@ -80,13 +79,7 @@ export default function SitePage({ params }: { params: { id: string } }) {
       </div>
 
       <div className="w-full flex gap-4 flex-col md:flex-row">
-        <div className="w-6/12">
-          <UploadSiteForm site={site} />
-        </div>
-
-        <div className="w-6/12">
-          <UploadImageForm site={site} />
-        </div>
+        <UploadSiteForm site={site} />
       </div>
 
       <div className="w-full flex gap-4 flex-col">
