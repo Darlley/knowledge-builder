@@ -29,6 +29,7 @@ import {
 import 'moment/locale/pt-br';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
 
 const columns = [
   {
@@ -83,6 +84,9 @@ export default function Page({
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [postToDelete, setPostToDelete] = useState<string | null>(null);
 
   return (
     <div className="flex flex-1 flex-col gap-4 lg:gap-6 p-4 lg:p-6">
@@ -239,39 +243,16 @@ export default function Page({
                         </Button>
                       </Tooltip>
 
-                      <Tooltip
-                        content={
-                          <div className="flex flex-col gap-2 p-4">
-                            <div className="text-sm font-bold">
-                              Tem certeza que deseja excluir?
-                            </div>
-                            <div className="flex">
-                              <Button
-                                color="danger"
-                                size="sm"
-                                isLoading={isDeleteAction}
-                                isDisabled={isDeleteAction}
-                                onClick={async () => {
-                                  setIsDeleteAction(true);
-                                  try {
-                                    await deletePost(siteId, item.id);
-                                  } catch (error) {
-                                    console.error('Erro ao excluir post:', error);
-                                  } finally {
-                                    setIsDeleteAction(false);
-                                  }
-                                }}
-                              >
-                                Sim, Excluir.
-                              </Button>
-                            </div>
-                          </div>
-                        }
+                      <Button 
+                        size="sm" 
+                        isIconOnly 
+                        onClick={() => {
+                          setPostToDelete(item.id);
+                          onOpen();
+                        }}
                       >
-                        <Button size="sm" isIconOnly>
-                          <Trash className="size-4 stroke-1" />
-                        </Button>
-                      </Tooltip>
+                        <Trash className="size-4 stroke-1" />
+                      </Button>
                     </ButtonGroup>
                   </div>
                 </TableCell>
@@ -280,6 +261,42 @@ export default function Page({
           </TableBody>
         </Table>
       )}
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">Confirmar exclusão</ModalHeader>
+              <ModalBody>
+                <p>Tem certeza que deseja excluir este post?</p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="default" variant="light" onPress={onClose}>
+                  Cancelar
+                </Button>
+                <Button
+                  color="danger"
+                  onPress={async () => {
+                    if (postToDelete) {
+                      setIsDeleteAction(true);
+                      try {
+                        await deletePost(siteId, postToDelete);
+                        onClose();
+                      } catch (error) {
+                        console.error('Erro ao excluir post:', error);
+                      } finally {
+                        setIsDeleteAction(false);
+                      }
+                    }
+                  }}
+                  isLoading={isDeleteAction}
+                >
+                  Sim, Excluir
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }
