@@ -9,195 +9,146 @@ export type PostTypeError = {
 
 export type PostTypeState = {
   posts: PostType[];
-  getPost: (params: {
-    userId: string, siteId: string, postId: string
-  }) => Promise<PostType>;
+  recentPosts: PostType[];
+  isLoading: boolean;
   getPosts: (userId: string, siteId: string) => Promise<void>;
-  createPost: (siteId: string, data: Partial<PostType>) => Promise<void>;
-  editPost: (siteId: string, postId: string, data: Partial<PostType>) => Promise<void>;
+  getRecentPosts: (userId: string, limit?: number) => Promise<void>;
+  createPost: (siteId: string, data: Partial<PostType>) => Promise<PostType>;
+  editPost: (siteId: string, postId: string, data: Partial<PostType>) => Promise<PostType>;
   deletePost: (siteId: string, postId: string) => Promise<void>;
 };
 
 const PostsStore = create<PostTypeState>((set, get) => ({
   posts: [],
-
-  getPost: async (params: {
-    userId: string, siteId: string, postId: string
-  }) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const response = await fetch(
-          `/api/sites/${params.siteId}/articles/${params.postId}?userId=${params.userId}`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-
-        if (response.ok) {
-          
-          const post = await response.json();
-          console.log("getPost", post)
-          resolve(post);
-        } else {
-          const result = await response.json();
-          const error: PostTypeError = {
-            type: result.type || 'unknownError',
-            message: result.message || 'Erro desconhecido',
-            status: response.status,
-          };
-          reject(error);
-        }
-      } catch (err) {
-        const customError: PostTypeError = {
-          type: 'networkError',
-          message: 'Erro de rede ou servidor',
-          status: 500,
-        };
-        reject(customError);
-      }
-    });
-  },
+  recentPosts: [],
+  isLoading: false,
 
   getPosts: async (userId: string, siteId: string) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const response = await fetch(
-          `/api/sites/${siteId}/articles?userId=${userId}`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-
-        if (response.ok) {
-          
-          const posts = await response.json();
-          set({ posts });
-          resolve(posts);
-        } else {
-          const result = await response.json();
-          const error: PostTypeError = {
-            type: result.type || 'unknownError',
-            message: result.message || 'Erro desconhecido',
-            status: response.status,
-          };
-          reject(error);
-        }
-      } catch (err) {
-        const customError: PostTypeError = {
-          type: 'networkError',
-          message: 'Erro de rede ou servidor',
-          status: 500,
-        };
-        reject(customError);
-      }
-    });
-  },
-
-  createPost: (siteId: string, data: Partial<PostType>) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const response = await fetch(`/api/sites/${siteId}/articles`, {
-          method: 'POST',
+    set({ isLoading: true });
+    try {
+      const response = await fetch(
+        `/api/sites/${siteId}/articles?userId=${userId}`,
+        {
+          method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(data),
-        });
-
-        if (response.ok) {
-          resolve();
-        } else {
-          const result = await response.json();
-          const error: PostTypeError = {
-            type: result.type || 'unknownError',
-            message: result.message || 'Erro desconhecido',
-            status: response.status,
-          };
-
-          reject(error);
         }
-      } catch (err) {
-        const customError: PostTypeError = {
-          type: 'networkError',
-          message: 'Erro de rede ou servidor',
-          status: 500,
-        };
-        reject(customError);
+      );
+
+      if (!response.ok) {
+        throw await response.json();
       }
-    });
+
+      const posts = await response.json();
+      set({ posts, isLoading: false });
+    } catch (error) {
+      set({ isLoading: false });
+      throw error;
+    }
   },
 
-  editPost: (siteId: string, postId: string, data: Partial<PostType>) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const response = await fetch(`/api/sites/${siteId}/articles/${postId}`, {
-          method: 'PATCH',
+  getRecentPosts: async (userId: string, limit = 5) => {
+    set({ isLoading: true });
+    try {
+      const response = await fetch(
+        `/api/sites/recent/articles?userId=${userId}&limit=${limit}&recent=true`,
+        {
+          method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(data),
-        });
-
-        if (response.ok) {
-          resolve();
-        } else {
-          const result = await response.json();
-          const error: PostTypeError = {
-            type: result.type || 'unknownError',
-            message: result.message || 'Erro desconhecido',
-            status: response.status,
-          };
-
-          reject(error);
         }
-      } catch (err) {
-        const customError: PostTypeError = {
-          type: 'networkError',
-          message: 'Erro de rede ou servidor',
-          status: 500,
-        };
-        reject(customError);
+      );
+
+      if (!response.ok) {
+        throw await response.json();
       }
-    });
+
+      const recentPosts = await response.json();
+      set({ recentPosts, isLoading: false });
+    } catch (error) {
+      set({ isLoading: false });
+      throw error;
+    }
   },
 
-  deletePost: (siteId: string, postId: string) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const response = await fetch(`/api/sites/${siteId}/articles/${postId}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+  createPost: async (siteId: string, data: Partial<PostType>) => {
+    set({ isLoading: true });
+    try {
+      const response = await fetch(`/api/sites/${siteId}/articles`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
 
-        if (response.ok) {
-          resolve();
-        } else {
-          const result = await response.json();
-          const error: PostTypeError = {
-            type: result.type || 'unknownError',
-            message: result.message || 'Erro desconhecido',
-            status: response.status,
-          };
-
-          reject(error);
-        }
-      } catch (err) {
-        const customError: PostTypeError = {
-          type: 'networkError',
-          message: 'Erro de rede ou servidor',
-          status: 500,
-        };
-        reject(customError);
+      if (!response.ok) {
+        throw await response.json();
       }
-    });
+
+      const newPost = await response.json();
+      set((state) => ({ 
+        posts: [newPost, ...state.posts],
+        isLoading: false 
+      }));
+      return newPost;
+    } catch (error) {
+      set({ isLoading: false });
+      throw error;
+    }
+  },
+
+  editPost: async (siteId: string, postId: string, data: Partial<PostType>) => {
+    set({ isLoading: true });
+    try {
+      const response = await fetch(`/api/sites/${siteId}/articles/${postId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw await response.json();
+      }
+
+      const updatedPost = await response.json();
+      set((state) => ({
+        posts: state.posts.map(post => post.id === postId ? updatedPost : post),
+        isLoading: false
+      }));
+      return updatedPost;
+    } catch (error) {
+      set({ isLoading: false });
+      throw error;
+    }
+  },
+
+  deletePost: async (siteId: string, postId: string) => {
+    set({ isLoading: true });
+    try {
+      const response = await fetch(`/api/sites/${siteId}/articles/${postId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw await response.json();
+      }
+
+      set((state) => ({
+        posts: state.posts.filter(post => post.id !== postId),
+        isLoading: false
+      }));
+    } catch (error) {
+      set({ isLoading: false });
+      throw error;
+    }
   },
 }));
 

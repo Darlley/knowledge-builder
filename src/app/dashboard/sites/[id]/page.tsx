@@ -1,12 +1,18 @@
 'use client';
 
 import PostsStore from '@/stores/PostStore';
+import SiteStore from '@/stores/SiteStore'; // Adicione esta importação
 import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
 import {
   Button,
   ButtonGroup,
   Chip,
   Image,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
   Spinner,
   Table,
   TableBody,
@@ -15,11 +21,13 @@ import {
   TableHeader,
   TableRow,
   Tooltip,
+  useDisclosure,
 } from '@nextui-org/react';
 import {
   CheckCircle,
   ChevronLeft,
   Cog,
+  Eye,
   File,
   Link2,
   Pen,
@@ -57,7 +65,7 @@ const columns = [
   },
 ];
 
-export default function page({
+export default function Page({
   params,
 }: {
   params: {
@@ -66,32 +74,28 @@ export default function page({
 }) {
   const { id: siteId } = params;
 
-  const [isRequestAction, setIsRequestAction] = useState(true);
-  const [isDeleteAction, setIsDeleteAction] = useState(false);
-
-  const { posts, getPosts, deletePost } = PostsStore();
+  const { posts, isLoading, getPosts, deletePost } = PostsStore();
   const { getUser } = useKindeBrowserClient();
+  const { getSite, currentSite } = SiteStore(); // Adicione esta linha
   const user = getUser();
 
-  async function fetchPosts(userId: string, siteId: string) {
-    await getPosts(userId, siteId)
-      .then(() => {
-        setIsRequestAction(false);
-      })
-      .catch(() => {
-        setIsRequestAction(false);
-      });
-  }
+  const [isDeleteAction, setIsDeleteAction] = useState(false);
 
   useEffect(() => {
-    fetchPosts(user?.id!, siteId);
-  }, [user, siteId]);
+    if (user?.id) {
+      getPosts(user.id, siteId);
+      getSite(siteId);
+    }
+  }, [user, siteId, getPosts, getSite]);
 
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [postToDelete, setPostToDelete] = useState<string | null>(null);
 
   return (
     <div className="flex flex-1 flex-col gap-4 lg:gap-6 p-4 lg:p-6">
@@ -110,6 +114,14 @@ export default function page({
         </div>
 
         <div className="gap-2 flex items-center">
+          <Button
+            endContent={<Eye className="stroke-[1.5] size-5" />}
+            as={Link}
+            href={`/blog/${currentSite?.subdirectory}`}
+            target="_blank"
+          >
+            <span>Acessar {currentSite?.name}</span>
+          </Button>
           <Button
             endContent={<Cog className="stroke-[1.5] size-5" />}
             as={Link}
@@ -130,28 +142,9 @@ export default function page({
 
       {isClient && (
         <Table
-          aria-label="Controlled table example with dynamic content"
+          aria-label="Tabela de artigos"
           fullWidth
-          // selectionMode="multiple"
           disableAnimation
-          // selectedKeys={selectedRows}
-          // onSelectionChange={setSelectedRows}
-          topContentPlacement="outside"
-          bottomContentPlacement="outside"
-          // bottomContent={
-          //   <div className="flex items-center justify-end px-2 w-full">
-          //     <span
-          //       className={clsx(
-          //         'text-small text-default-400',
-          //         selectedRows === 'all' ? 'font-bold' : ''
-          //       )}
-          //     >
-          //       {selectedRows === 'all'
-          //         ? `Todos foram selecionados`
-          //         : `${selectedRows.size} de ${contacts.length} selecionados`}
-          //     </span>
-          //   </div>
-          // }
           classNames={{
             base: 'flex-grow h-full text-default-600 overflow-hidden ',
           }}
@@ -166,7 +159,7 @@ export default function page({
           </TableHeader>
           <TableBody
             items={posts}
-            isLoading={isRequestAction}
+            isLoading={isLoading}
             loadingContent={<Spinner label="Buscando suas publicações..." />}
             emptyContent={
               <div className="flex flex-col items-center justify-center rounded-md border border-dashed dark:border-gray-900 p-8 text-center animate-in fade-in-50">
@@ -177,8 +170,8 @@ export default function page({
                   Você não criou nenhuma postagem para o seu site
                 </h2>
                 <p className="mt-2 mb-8 text-center text-sm leading-tight text-default-400 max-w-sm">
-                  You currently dont have any sites. Please create some so that
-                  you can see them right here!
+                  Você ainda não tem nenhuma publicação. Crie uma agora para
+                  vê-la aqui!
                 </p>
 
                 <Button
@@ -252,7 +245,13 @@ export default function page({
                   <div className="flex items-center gap-2 w-full justify-start">
                     <ButtonGroup fullWidth>
                       <Tooltip content={`Ver artigo`} color="primary">
-                        <Button size="sm" isIconOnly as={Link} href={`/${siteId}/blog/${item?.slug}`} target="_blank">
+                        <Button
+                          size="sm"
+                          isIconOnly
+                          as={Link}
+                          href={`/${siteId}/blog/${item?.slug}`}
+                          target="_blank"
+                        >
                           <Link2 className="size-4 stroke-1" />
                         </Button>
                       </Tooltip>
@@ -268,43 +267,16 @@ export default function page({
                         </Button>
                       </Tooltip>
 
-                      <Tooltip
-                        content={
-                          <div className="flex flex-col gap-2 p-4">
-                            <div className="text-sm font-bold">
-                              Tem certeza que deseja excluir?
-                            </div>
-                            <div className="flex">
-                              <Button
-                                color="danger"
-                                size="sm"
-                                isLoading={isDeleteAction}
-                                isDisabled={isDeleteAction}
-                                onClick={async () =>
-                                  new Promise((resolve, reject) => {
-                                    deletePost(siteId, item.id)
-                                      .then(() => {
-                                        fetchPosts(user?.id!, siteId);
-                                        setIsDeleteAction(false);
-                                        resolve();
-                                      })
-                                      .catch(() => {
-                                        setIsDeleteAction(false);
-                                        reject();
-                                      });
-                                  })
-                                }
-                              >
-                                Sim, Excluir.
-                              </Button>
-                            </div>
-                          </div>
-                        }
+                      <Button
+                        size="sm"
+                        isIconOnly
+                        onClick={() => {
+                          setPostToDelete(item.id);
+                          onOpen();
+                        }}
                       >
-                        <Button size="sm" isIconOnly>
-                          <Trash className="size-4 stroke-1" />
-                        </Button>
-                      </Tooltip>
+                        <Trash className="size-4 stroke-1" />
+                      </Button>
                     </ButtonGroup>
                   </div>
                 </TableCell>
@@ -313,6 +285,44 @@ export default function page({
           </TableBody>
         </Table>
       )}
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Confirmar exclusão
+              </ModalHeader>
+              <ModalBody>
+                <p>Tem certeza que deseja excluir este post?</p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="default" variant="light" onPress={onClose}>
+                  Cancelar
+                </Button>
+                <Button
+                  color="danger"
+                  onPress={async () => {
+                    if (postToDelete) {
+                      setIsDeleteAction(true);
+                      try {
+                        await deletePost(siteId, postToDelete);
+                        onClose();
+                      } catch (error) {
+                        console.error('Erro ao excluir post:', error);
+                      } finally {
+                        setIsDeleteAction(false);
+                      }
+                    }
+                  }}
+                  isLoading={isDeleteAction}
+                >
+                  Sim, Excluir
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { siteSchema } from '@/utils/zodSchemas';
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { NextRequest, NextResponse } from 'next/server';
+import { SiteCreateSchema } from '@/utils/zodSchemas'; // Import the SiteCreateSchema
 
 export async function GET(request: NextRequest) {
   const { getUser } = getKindeServerSession(); // Substitua pela forma correta de obter o usuário
@@ -44,16 +45,29 @@ export async function POST(request: Request) {
   }
 
   try {
-    const {userId, ...formData} = await request.json();
-    const parsed = siteSchema.safeParse(formData);
+    const { userId, ...formData } = await request.json();
+
+    const isSubdirectoryUnique = async () => {
+      const existingSite = await prisma.site.findUnique({
+        where: { subdirectory: formData.subdirectory },
+      });
+      return !existingSite;
+    };
+
+    const createSiteSchema = SiteCreateSchema({ isSubdirectoryUnique });
+    const parsed = await createSiteSchema.safeParseAsync(formData);
 
     if (!parsed.success) {
-      // Retornar erros de validação Zod
+      const errors = parsed.error.errors.map(err => ({
+        field: err.path[0],
+        message: err.message
+      }));
+
       return NextResponse.json(
         {
-          type: 'validation',
-          message: 'Dados inválidos',
-          status: 400,
+          type: 'validationError',
+          message: 'Erro de validação',
+          errors: errors
         },
         { status: 400 }
       );
@@ -61,56 +75,25 @@ export async function POST(request: Request) {
 
     const { name, description, subdirectory } = parsed.data;
 
-    // Tentar criar o site
-    try {
-      await prisma.site.create({
-        data: {
-          name,
-          description,
-          subdirectory,
-          userId
-        },
-      });
+    await prisma.site.create({
+      data: {
+        name,
+        description,
+        subdirectory,
+        userId
+      },
+    });
 
-      // Retornar sucesso
-      return NextResponse.json(
-        { message: 'Site criado com sucesso' },
-        { status: 200 }
-      );
-    } catch (prismaError) {
-      // Verificar se o erro é uma instância de PrismaClientKnownRequestError
-      if (prismaError instanceof PrismaClientKnownRequestError) {
-        // Tratar erros específicos do Prisma
-        if (prismaError.code === 'P2002') {
-          // Violação de unicidade (subdirectory)
-          return NextResponse.json(
-            {
-              type: 'directoryExists',
-              message: 'Subdiretório já existe',
-              status: 400,
-            },
-            { status: 400 }
-          );
-        }
-      }
-
-      // Outros erros do Prisma
-      return NextResponse.json(
-        {
-          type: 'serverError',
-          message: 'Erro ao criar o site',
-          status: 500,
-        },
-        { status: 500 }
-      );
-    }
+    return NextResponse.json(
+      { message: 'Site criado com sucesso' },
+      { status: 200 }
+    );
   } catch (error) {
-    // Erro inesperado
     return NextResponse.json(
       {
         type: 'serverError',
         message: 'Erro interno do servidor',
-        status: 500,
+        error: 'Ocorreu um erro inesperado ao processar a solicitação.'
       },
       { status: 500 }
     );

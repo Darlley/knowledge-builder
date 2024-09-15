@@ -128,7 +128,7 @@ export default function ArticleCleatePage({
       })
         .then(() => {
           toast.success('Artigo editado com sucesso 🎉');
-          router.push(`/dashboard/sites/${siteId}`);
+          window.location.href = `/dashboard/sites/${siteId}`;
         })
         .catch((error: ErrorType) => {
           console.error(error);
@@ -152,7 +152,7 @@ export default function ArticleCleatePage({
     })
       .then(() => {
         toast.success('Artigo criado com sucesso 🎉');
-        router.push(`/dashboard/sites/${siteId}`);
+        window.location.href = `/dashboard/sites/${siteId}`;
       })
       .catch((error) => {
         console.error(error);

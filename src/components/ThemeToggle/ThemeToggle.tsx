@@ -1,3 +1,5 @@
+"use client"
+
 import {
   Button,
   Dropdown,
@@ -6,18 +8,32 @@ import {
   DropdownTrigger,
 } from '@nextui-org/react';
 import { Computer, Moon, Sun } from 'lucide-react';
+import { useTheme } from 'next-themes';
 
-import { ThemeToggleProps } from './ThemeToggle.types';
-export default function ThemeToggle(props: ThemeToggleProps) {
-  const { theme, onChange } = props;
+export default function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+
+  const getThemeIcon = () => {
+    switch (theme) {
+      case 'dark':
+        return <Moon className="size-5 stroke-[1.5]" />;
+      case 'light':
+        return <Sun className="size-5 stroke-[1.5]" />;
+      case 'system':
+        return <Computer className="size-5 stroke-[1.5]" />;
+      default:
+        return <Moon className="size-5 stroke-[1.5]" />;
+    }
+  };
 
   return (
     <Dropdown>
       <DropdownTrigger>
         <Button
+          isIconOnly
           variant="bordered"
         >
-          Tema
+          {getThemeIcon()}
         </Button>
       </DropdownTrigger>
       <DropdownMenu
@@ -25,7 +41,7 @@ export default function ThemeToggle(props: ThemeToggleProps) {
         aria-label="Dropdown menu with icons"
         selectionMode='single'
         onAction={(key) =>
-          key != 'all' && onChange(key as 'dark' | 'light' | 'system')
+          key != 'all' && setTheme(key as 'dark' | 'light' | 'system')
         }
         selectedKeys={theme}
       >

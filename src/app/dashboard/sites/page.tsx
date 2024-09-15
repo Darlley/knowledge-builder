@@ -20,21 +20,15 @@ import { useEffect, useState } from 'react';
 import SiteStore from '@/stores/SiteStore';
 
 export default function page() {
-  const [isRequestAction, setIsRequestAction] = useState(false);
-  const { sites, getSites } = SiteStore();
+  const { sites, getSites, isLoading } = SiteStore();
   const { getUser } = useKindeBrowserClient();
   const user = getUser();
 
   useEffect(() => {
-    setIsRequestAction(true);
-    getSites(user?.id! as string)
-      .then(() => {
-        setIsRequestAction(false);
-      })
-      .catch(() => {
-        setIsRequestAction(false);
-      });
-  }, [user]);
+    if (user?.id) {
+      getSites(user.id);
+    }
+  }, [user, getSites]);
 
   return (
     <div className="flex flex-1 flex-col gap-4 lg:gap-6 p-4 lg:p-6">
@@ -49,7 +43,7 @@ export default function page() {
         </Button>
       </div>
 
-      {isRequestAction ? (
+      {isLoading ? (
         <Spinner label="Buscando seus sites..." />
       ) : sites?.length > 0 ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -57,7 +51,7 @@ export default function page() {
             <Link key={site?.id} href={`/dashboard/sites/${site?.id}`}>
               <Card
                 classNames={{
-                  base: 'dark:bg-gray-950 border dark:border-gray-900',
+                  base: 'dark:bg-gray-950 border dark:border-gray-900 h-[400px]',
                   footer: 'flex w-full justify-between items-center',
                 }}
               >
@@ -66,12 +60,13 @@ export default function page() {
                     src={site.imageUrl || '/default.png'}
                     fallbackSrc="/default.png"
                     alt="NextUI Image with fallback"
+                    className='object-cover h-full'
                   />
                 </CardHeader>
                 <CardBody>
-                  <div>
-                    <h3 className="text-lg font-bold">{site.name}</h3>
-                    <p>{site.description}</p>
+                  <div className='mt-auto'>
+                    <h3 className="text-lg font-bold truncate">{site.name}</h3>
+                    <p className="line-clamp-1">{site.description}</p>
                   </div>
                 </CardBody>
                 <CardFooter>

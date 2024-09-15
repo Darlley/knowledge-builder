@@ -20,8 +20,9 @@ export type ISiteError = {
 export type ISiteState = {
   sites: ISite[];
   currentSite: ISite | null;
+  isLoading: boolean;
   getSites: (userId: string) => Promise<void>;
-  getSite: (siteId: string) => Promise<ISite>; // Modificado para retornar Promise<ISite>
+  getSite: (siteId: string) => Promise<ISite>;
   createSite: (userId: string, data: Partial<ISite>) => Promise<void>;
   updateSite: (siteId: string, userId: string, data: Partial<ISite>) => Promise<void>;
   deleteSite: (siteId: string, userId: string) => Promise<void>;
@@ -30,8 +31,10 @@ export type ISiteState = {
 const SiteStore = create<ISiteState>((set, get) => ({
   sites: [],
   currentSite: null,
+  isLoading: false,
 
   getSites: async (userId: string) => {
+    set({ isLoading: true });
     return new Promise(async (resolve, reject) => {
       try {
         const response = await fetch(`/api/sites?userId=${userId}`, {
@@ -43,7 +46,7 @@ const SiteStore = create<ISiteState>((set, get) => ({
 
         if (response.ok) {
           const sites = await response.json();
-          set({ sites });
+          set({ sites, isLoading: false });
           resolve(sites);
         } else {
           const result = await response.json();
@@ -66,6 +69,7 @@ const SiteStore = create<ISiteState>((set, get) => ({
   },
 
   getSite: async (siteId: string): Promise<ISite> => {
+    set({ isLoading: true });
     try {
       const response = await fetch(`/api/sites/${siteId}`, {
         method: 'GET',
@@ -76,8 +80,8 @@ const SiteStore = create<ISiteState>((set, get) => ({
 
       if (response.ok) {
         const site: ISite = await response.json();
-        set({ currentSite: site });
-        return site; // Retorna o site diretamente
+        set({ currentSite: site, isLoading: false });
+        return site;
       } else {
         const result = await response.json();
         throw {
@@ -87,6 +91,7 @@ const SiteStore = create<ISiteState>((set, get) => ({
         } as ISiteError;
       }
     } catch (err) {
+      set({ isLoading: false });
       throw {
         type: 'networkError',
         message: 'Erro de rede ou servidor',
@@ -106,29 +111,19 @@ const SiteStore = create<ISiteState>((set, get) => ({
           body: JSON.stringify({userId, ...data}),
         });
 
+        const result = await response.json();
+
         if (response.ok) {
-
-          resolve();
-
+          resolve(result);
         } else {
-
-          const result = await response.json();
-          const error: ISiteError = {
-            type: result.type || 'unknownError',
-            message: result.message || 'Erro desconhecido',
-            status: response.status,
-          };
-
-          reject(error);
-
+          reject(result); // Propaga o erro completo retornado pela API
         }
       } catch (err) {
-        const customError: ISiteError = {
+        reject({
           type: 'networkError',
           message: 'Erro de rede ou servidor',
-          status: 500,
-        };
-        reject(customError);
+          error: err
+        });
       }
     });
   },
