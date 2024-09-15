@@ -1,4 +1,3 @@
-// src/app/api/create-site/route.ts
 import prisma from '@/utils/db';
 import { requireUser } from '@/utils/requireUser';
 import { postSchema } from '@/utils/zodSchemas';
@@ -16,36 +15,70 @@ export async function GET(
   }
 ) {
   const siteId = params.siteId;
-
   const user = requireUser();
 
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get('userId');
+  const limit = parseInt(searchParams.get('limit') || '10', 10);
+  const isRecent = searchParams.get('recent') === 'true';
 
   try {
-    const articles = await prisma.post.findMany({
-      where: {
-        userId,
-        siteId,
-      },
-      select: {
-        thumbnail: true,
-        title: true,
-        status: true,
-        id: true,
-        createdAt: true,
-        slug: true,
-        audience: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    let articles;
+
+    if (isRecent) {
+      // Buscar posts recentes de todos os sites
+      articles = await prisma.post.findMany({
+        where: {
+          userId,
+        },
+        select: {
+          id: true,
+          thumbnail: true,
+          title: true,
+          description: true,
+          status: true,
+          createdAt: true,
+          slug: true,
+          audience: true,
+          Site: {
+            select: {
+              id: true,
+              name: true,
+              subdirectory: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        take: limit,
+      });
+    } else {
+      // Buscar posts de um site específico
+      articles = await prisma.post.findMany({
+        where: {
+          userId,
+          siteId,
+        },
+        select: {
+          id: true,
+          thumbnail: true,
+          title: true,
+          status: true,
+          createdAt: true,
+          slug: true,
+          audience: true,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+    }
 
     return NextResponse.json(articles, { status: 200 });
   } catch (error) {
     return NextResponse.json(
-      { error: 'Erro ao listar os sites' },
+      { error: 'Erro ao listar os artigos' },
       { status: 500 }
     );
   }

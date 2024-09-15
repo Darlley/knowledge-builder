@@ -14,11 +14,8 @@ import {
   DropdownTrigger,
   User,
 } from '@nextui-org/react';
-import { useTheme } from 'next-themes';
 
 export default function layout({ children }: { children: ReactNode }) {
-  const { theme, setTheme } = useTheme();
-
   return (
     <section className="grid h-svh w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr] max-h-svh overflow-hidden">
       <div className="hidden border-r dark:border-slate-900 bg-muted/40 md:block">
@@ -82,10 +79,7 @@ export default function layout({ children }: { children: ReactNode }) {
               </DropdownMenu>
             </Dropdown>
 
-            <ThemeToggle
-              theme={theme}
-              onChange={(switchedTheme) => setTheme(switchedTheme)}
-            />
+            <ThemeToggle />
           </div>
         </header>
         <main className="flex-1 dark:bg-gray-950 h-full max-h-full overflow-y-auto flex-grow">
