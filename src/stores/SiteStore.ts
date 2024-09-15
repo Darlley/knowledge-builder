@@ -22,7 +22,7 @@ export type ISiteState = {
   currentSite: ISite | null;
   isLoading: boolean;
   getSites: (userId: string) => Promise<void>;
-  getSite: (siteId: string) => Promise<ISite>; // Modificado para retornar Promise<ISite>
+  getSite: (siteId: string) => Promise<ISite>;
   createSite: (userId: string, data: Partial<ISite>) => Promise<void>;
   updateSite: (siteId: string, userId: string, data: Partial<ISite>) => Promise<void>;
   deleteSite: (siteId: string, userId: string) => Promise<void>;
@@ -69,6 +69,7 @@ const SiteStore = create<ISiteState>((set, get) => ({
   },
 
   getSite: async (siteId: string): Promise<ISite> => {
+    set({ isLoading: true });
     try {
       const response = await fetch(`/api/sites/${siteId}`, {
         method: 'GET',
@@ -79,8 +80,8 @@ const SiteStore = create<ISiteState>((set, get) => ({
 
       if (response.ok) {
         const site: ISite = await response.json();
-        set({ currentSite: site });
-        return site; // Retorna o site diretamente
+        set({ currentSite: site, isLoading: false });
+        return site;
       } else {
         const result = await response.json();
         throw {
@@ -90,6 +91,7 @@ const SiteStore = create<ISiteState>((set, get) => ({
         } as ISiteError;
       }
     } catch (err) {
+      set({ isLoading: false });
       throw {
         type: 'networkError',
         message: 'Erro de rede ou servidor',

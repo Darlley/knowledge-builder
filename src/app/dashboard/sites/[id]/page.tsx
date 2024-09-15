@@ -1,12 +1,18 @@
 'use client';
 
 import PostsStore from '@/stores/PostStore';
+import SiteStore from '@/stores/SiteStore'; // Adicione esta importação
 import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
 import {
   Button,
   ButtonGroup,
   Chip,
   Image,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
   Spinner,
   Table,
   TableBody,
@@ -15,11 +21,13 @@ import {
   TableHeader,
   TableRow,
   Tooltip,
+  useDisclosure,
 } from '@nextui-org/react';
 import {
   CheckCircle,
   ChevronLeft,
   Cog,
+  Eye,
   File,
   Link2,
   Pen,
@@ -29,7 +37,6 @@ import {
 import 'moment/locale/pt-br';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
 
 const columns = [
   {
@@ -69,6 +76,7 @@ export default function Page({
 
   const { posts, isLoading, getPosts, deletePost } = PostsStore();
   const { getUser } = useKindeBrowserClient();
+  const { getSite, currentSite } = SiteStore(); // Adicione esta linha
   const user = getUser();
 
   const [isDeleteAction, setIsDeleteAction] = useState(false);
@@ -76,8 +84,9 @@ export default function Page({
   useEffect(() => {
     if (user?.id) {
       getPosts(user.id, siteId);
+      getSite(siteId);
     }
-  }, [user, siteId, getPosts]);
+  }, [user, siteId, getPosts, getSite]);
 
   const [isClient, setIsClient] = useState(false);
 
@@ -105,6 +114,14 @@ export default function Page({
         </div>
 
         <div className="gap-2 flex items-center">
+          <Button
+            endContent={<Eye className="stroke-[1.5] size-5" />}
+            as={Link}
+            href={`/blog/${currentSite?.subdirectory}`}
+            target="_blank"
+          >
+            <span>Acessar {currentSite?.name}</span>
+          </Button>
           <Button
             endContent={<Cog className="stroke-[1.5] size-5" />}
             as={Link}
@@ -153,7 +170,8 @@ export default function Page({
                   Você não criou nenhuma postagem para o seu site
                 </h2>
                 <p className="mt-2 mb-8 text-center text-sm leading-tight text-default-400 max-w-sm">
-                  Você ainda não tem nenhuma publicação. Crie uma agora para vê-la aqui!
+                  Você ainda não tem nenhuma publicação. Crie uma agora para
+                  vê-la aqui!
                 </p>
 
                 <Button
@@ -227,7 +245,13 @@ export default function Page({
                   <div className="flex items-center gap-2 w-full justify-start">
                     <ButtonGroup fullWidth>
                       <Tooltip content={`Ver artigo`} color="primary">
-                        <Button size="sm" isIconOnly as={Link} href={`/${siteId}/blog/${item?.slug}`} target="_blank">
+                        <Button
+                          size="sm"
+                          isIconOnly
+                          as={Link}
+                          href={`/${siteId}/blog/${item?.slug}`}
+                          target="_blank"
+                        >
                           <Link2 className="size-4 stroke-1" />
                         </Button>
                       </Tooltip>
@@ -243,9 +267,9 @@ export default function Page({
                         </Button>
                       </Tooltip>
 
-                      <Button 
-                        size="sm" 
-                        isIconOnly 
+                      <Button
+                        size="sm"
+                        isIconOnly
                         onClick={() => {
                           setPostToDelete(item.id);
                           onOpen();
@@ -265,7 +289,9 @@ export default function Page({
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">Confirmar exclusão</ModalHeader>
+              <ModalHeader className="flex flex-col gap-1">
+                Confirmar exclusão
+              </ModalHeader>
               <ModalBody>
                 <p>Tem certeza que deseja excluir este post?</p>
               </ModalBody>

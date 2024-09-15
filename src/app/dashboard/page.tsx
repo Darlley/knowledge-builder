@@ -11,18 +11,50 @@ import { useEffect, useState } from 'react';
 import SiteStore from '@/stores/SiteStore';
 import PostsStore from '@/stores/PostStore';
 
+// Importação do SWR comentada
+// import useSWR from 'swr';
+
+// Funções de fetcher comentadas
+/*
+const fetchSites = async (userId: string) => {
+  const response = await fetch(`/api/sites?userId=${userId}`);
+  if (!response.ok) throw new Error('Falha ao carregar sites');
+  return response.json();
+};
+
+const fetchRecentPosts = async (userId: string, limit: number) => {
+  const response = await fetch(`/api/posts/recent?userId=${userId}&limit=${limit}`);
+  if (!response.ok) throw new Error('Falha ao carregar posts recentes');
+  return response.json();
+};
+*/
+
 export default function DashboardPage() {
   const { sites, getSites, isLoading: sitesLoading } = SiteStore();
   const { recentPosts, getRecentPosts, isLoading: postsLoading } = PostsStore();
   const { getUser } = useKindeBrowserClient();
   const user = getUser();
 
+  // Implementação atual
   useEffect(() => {
     if (user?.id) {
       getSites(user.id);
       getRecentPosts(user.id, 5);
     }
   }, [user, getSites, getRecentPosts]);
+
+  // Implementação com SWR comentada
+  /*
+  const { data: sites, error: sitesError, isLoading: sitesLoading } = useSWR(
+    user?.id ? `sites-${user.id}` : null,
+    () => fetchSites(user!.id)
+  );
+
+  const { data: recentPosts, error: postsError, isLoading: postsLoading } = useSWR(
+    user?.id ? `recent-posts-${user.id}` : null,
+    () => fetchRecentPosts(user!.id, 5)
+  );
+  */
 
   return (
     <div className="flex flex-1 flex-col gap-8 p-4 lg:p-6">
@@ -156,3 +188,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+
