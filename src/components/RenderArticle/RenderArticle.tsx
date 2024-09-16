@@ -67,7 +67,7 @@ export default function RenderArticle({ json }: RenderArticleProps) {
 
   return (
     <div
-      className="tex-left prose m-auto w-11/12 sm:prose-lg dark:prose-invert sm:w-2/3 prose-li:marker:text-primary-500"
+      className="tex-left prose m-auto w-full sm:prose-lg dark:prose-invert prose-li:marker:text-primary-500"
       dangerouslySetInnerHTML={{ __html: outPut }}
     />
   );
