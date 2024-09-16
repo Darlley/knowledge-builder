@@ -13,12 +13,10 @@ import { useMemo } from 'react';
 import { RenderArticleProps } from './RenderArticle.types';
 
 // Adicione mais extensões conforme necessário
-import HardBreak from '@tiptap/extension-hard-break';
-import OrderedList from '@tiptap/extension-ordered-list';
-import Link from '@tiptap/extension-link';
 import Code from '@tiptap/extension-code';
+import Link from '@tiptap/extension-link';
+import TextStyle from '@tiptap/extension-text-style';
 import Underline from '@tiptap/extension-underline';
-import TextStyle from '@tiptap/extension-text-style'
 
 export default function RenderArticle({ json }: RenderArticleProps) {
   console.log('props json', json);
@@ -67,5 +65,10 @@ export default function RenderArticle({ json }: RenderArticleProps) {
     return <p>Não foi possível renderizar o conteúdo.</p>;
   }
 
-  return <div className='tex-left' dangerouslySetInnerHTML={{ __html: outPut }} />;
+  return (
+    <div
+      className="tex-left prose m-auto w-11/12 sm:prose-lg dark:prose-invert sm:w-2/3 prose-li:marker:text-primary-500"
+      dangerouslySetInnerHTML={{ __html: outPut }}
+    />
+  );
 }

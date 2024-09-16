@@ -50,7 +50,7 @@ export default async function Page({
       <p className="text-gray-600 mb-4 text-center">
         {moment(post.createdAt).format('D [de] MMMM [de] YYYY, HH:mm')}
       </p>
-      <p className='text-center'>{post.description}</p>
+      <p className="text-center">{post.description}</p>
 
       <Image
         src={post?.thumbnail || '/default.png'}
