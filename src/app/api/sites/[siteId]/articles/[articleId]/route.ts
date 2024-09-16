@@ -27,9 +27,7 @@ export async function GET(
   try {
     const article = await prisma.post.findUnique({
       where: {
-        id: articleId,
-        userId,
-        siteId,
+        id: articleId
       },
       select: {
         thumbnail: true,

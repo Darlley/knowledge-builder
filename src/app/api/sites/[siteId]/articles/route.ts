@@ -120,57 +120,46 @@ export async function POST(
     const { title, content, description, slug, thumbnail, status, audience } =
       parsed.data;
 
-    try {
-      await prisma.post.create({
-        data: {
-          title,
-          content: JSON.stringify(content),
-          description,
-          slug,
-          thumbnail,
-          status,
-          audience,
-          siteId,
-          userId
-        },
-      });
+    await prisma.post.create({
+      data: {
+        title,
+        content: JSON.stringify(content), // Aqui está o ponto importante
+        description,
+        slug,
+        thumbnail,
+        status,
+        audience,
+        siteId,
+        userId
+      },
+    });
 
-      // Retornar sucesso
-      return NextResponse.json(
-        { message: 'Artigo criado com sucesso.' },
-        { status: 200 }
-      );
-    } catch (prismaError) {
-      // Outros erros do Prisma
-      if (prismaError instanceof PrismaClientKnownRequestError) {
+    // Retornar sucesso
+    return NextResponse.json(
+      { message: 'Artigo criado com sucesso.' },
+      { status: 200 }
+    );
+  } catch (prismaError) {
+    // Outros erros do Prisma
+    if (prismaError instanceof PrismaClientKnownRequestError) {
 
-        if (prismaError.code === 'P2002') {
-          // Violação de unicidade (subdirectory)
-          return NextResponse.json(
-            {
-              type: 'slugExists',
-              message: 'Slug já existe',
-              status: 400,
-            },
-            { status: 400 }
-          );
-        }
+      if (prismaError.code === 'P2002') {
+        // Violação de unicidade (subdirectory)
+        return NextResponse.json(
+          {
+            type: 'slugExists',
+            message: 'Slug já existe',
+            status: 400,
+          },
+          { status: 400 }
+        );
       }
-
-      return NextResponse.json(
-        {
-          type: 'serverError',
-          message: 'Erro ao criar o artigo',
-          status: 500,
-        },
-        { status: 500 }
-      );
     }
-  } catch (error) {
+
     return NextResponse.json(
       {
         type: 'serverError',
-        message: 'Erro interno do servidor',
+        message: 'Erro ao criar o artigo',
         status: 500,
       },
       { status: 500 }
