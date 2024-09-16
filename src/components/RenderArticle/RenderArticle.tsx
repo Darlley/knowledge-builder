@@ -19,7 +19,6 @@ import TextStyle from '@tiptap/extension-text-style';
 import Underline from '@tiptap/extension-underline';
 
 export default function RenderArticle({ json }: RenderArticleProps) {
-  console.log('props json', json);
 
   const outPut = useMemo(() => {
     let parsedJson;
