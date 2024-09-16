@@ -40,7 +40,7 @@ export default async function BlogIndexPage({
 
   return (
     <>
-      <nav className="grid grid-cols-3 my-10">
+      <nav className="grid grid-cols-3">
         <div className="col-span-1"></div>
         <div className="flex items-center gap-x-2 justify-center">
           <LogotipoIcon width="50" height="39" />

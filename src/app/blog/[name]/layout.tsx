@@ -12,8 +12,8 @@ export default function BlogLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="w-full h-full min-h-svh dark:bg-gray-950">
-      <main className="max-w-7xl mx-auto px-4 lg:px-0 ">{children}</main>
+    <div className="w-full h-full min-h-svh">
+      <main className="max-w-7xl mx-auto px-4 lg:px-0 py-10 space-y-10">{children}</main>
     </div>
   );
 }
