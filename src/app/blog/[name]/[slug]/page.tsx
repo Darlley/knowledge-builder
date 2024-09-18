@@ -86,7 +86,7 @@ export default async function Page({
               name={post.User?.name || 'Autor desconhecido'}
               description={
                 '5 min de leitura · ' +
-                moment(post.createdAt).format('D [de] MMMM [de] YYYY')
+                new Intl.DateTimeFormat('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(post.createdAt))
               }
               avatarProps={{
                 src: post.User?.profileImage || '/default.png',

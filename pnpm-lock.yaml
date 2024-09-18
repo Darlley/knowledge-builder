@@ -68,6 +68,12 @@ importers:
       '@tiptap/extension-paragraph':
         specifier: ^2.6.6
         version: 2.6.6(@tiptap/core@2.6.6(@tiptap/pm@2.6.6))
+      '@tiptap/extension-task-item':
+        specifier: ^2.7.1
+        version: 2.7.1(@tiptap/core@2.6.6(@tiptap/pm@2.6.6))(@tiptap/pm@2.6.6)
+      '@tiptap/extension-task-list':
+        specifier: ^2.7.1
+        version: 2.7.1(@tiptap/core@2.6.6(@tiptap/pm@2.6.6))
       '@tiptap/extension-text':
         specifier: ^2.6.6
         version: 2.6.6(@tiptap/core@2.6.6(@tiptap/pm@2.6.6))
@@ -2335,16 +2341,16 @@ packages:
     peerDependencies:
       '@tiptap/core': ^2.6.6
 
-  '@tiptap/extension-task-item@2.6.6':
-    resolution: {integrity: sha512-fvzy8/TN5sm3A2HSokJzHj5ZvcOAsRdqPS6fPOpmf5dQZ+EIAJrlfyxqb9B6055pNXBbuXcMEXdeU44zCU0YRg==}
+  '@tiptap/extension-task-item@2.7.1':
+    resolution: {integrity: sha512-/xv0jcait6Sz6hcBEH2eJfIm/rzQzaKjmftRFV/V2ogVbDunLoaaz95hTgOuOrBV+YMaz7Nx+KSxaJrxIbwCzg==}
     peerDependencies:
-      '@tiptap/core': ^2.6.6
-      '@tiptap/pm': ^2.6.6
+      '@tiptap/core': ^2.7.0
+      '@tiptap/pm': ^2.7.0
 
-  '@tiptap/extension-task-list@2.6.6':
-    resolution: {integrity: sha512-0N4xCCJZu0PcKoCRDywQngNNW6qlB26hyVJGDGgW53p/2zk5gdlzAA6/NxElO3iSAXKFm0QOWAg/x8E+ggDu4w==}
+  '@tiptap/extension-task-list@2.7.1':
+    resolution: {integrity: sha512-TQv5+TzizVYgl/CDhoxT/EpMsdG4xuYxAZCnPz8q6MGgroUY+B/sgLjqnWhahYaD0B9pUCip1gXEAC8i+aWI7g==}
     peerDependencies:
-      '@tiptap/core': ^2.6.6
+      '@tiptap/core': ^2.7.0
 
   '@tiptap/extension-text-style@2.6.6':
     resolution: {integrity: sha512-8fO8m0/QI+rFKgZLP28GG2Nz0zhYsYd76O2Y+HsDTmMypJl/cdiNcVOWWffAwXAfMN43BNX7b1VI1XwGAMgYlg==}
@@ -8440,12 +8446,12 @@ snapshots:
     dependencies:
       '@tiptap/core': 2.6.6(@tiptap/pm@2.6.6)
 
-  '@tiptap/extension-task-item@2.6.6(@tiptap/core@2.6.6(@tiptap/pm@2.6.6))(@tiptap/pm@2.6.6)':
+  '@tiptap/extension-task-item@2.7.1(@tiptap/core@2.6.6(@tiptap/pm@2.6.6))(@tiptap/pm@2.6.6)':
     dependencies:
       '@tiptap/core': 2.6.6(@tiptap/pm@2.6.6)
       '@tiptap/pm': 2.6.6
 
-  '@tiptap/extension-task-list@2.6.6(@tiptap/core@2.6.6(@tiptap/pm@2.6.6))':
+  '@tiptap/extension-task-list@2.7.1(@tiptap/core@2.6.6(@tiptap/pm@2.6.6))':
     dependencies:
       '@tiptap/core': 2.6.6(@tiptap/pm@2.6.6)
 
@@ -10496,8 +10502,8 @@ snapshots:
       '@tiptap/extension-image': 2.6.6(@tiptap/core@2.6.6(@tiptap/pm@2.6.6))
       '@tiptap/extension-link': 2.6.6(@tiptap/core@2.6.6(@tiptap/pm@2.6.6))(@tiptap/pm@2.6.6)
       '@tiptap/extension-placeholder': 2.0.3(@tiptap/core@2.6.6(@tiptap/pm@2.6.6))(@tiptap/pm@2.6.6)
-      '@tiptap/extension-task-item': 2.6.6(@tiptap/core@2.6.6(@tiptap/pm@2.6.6))(@tiptap/pm@2.6.6)
-      '@tiptap/extension-task-list': 2.6.6(@tiptap/core@2.6.6(@tiptap/pm@2.6.6))
+      '@tiptap/extension-task-item': 2.7.1(@tiptap/core@2.6.6(@tiptap/pm@2.6.6))(@tiptap/pm@2.6.6)
+      '@tiptap/extension-task-list': 2.7.1(@tiptap/core@2.6.6(@tiptap/pm@2.6.6))
       '@tiptap/extension-text-style': 2.6.6(@tiptap/core@2.6.6(@tiptap/pm@2.6.6))
       '@tiptap/extension-underline': 2.6.6(@tiptap/core@2.6.6(@tiptap/pm@2.6.6))
       '@tiptap/extension-youtube': 2.6.6(@tiptap/core@2.6.6(@tiptap/pm@2.6.6))

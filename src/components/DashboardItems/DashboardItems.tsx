@@ -19,7 +19,7 @@ export default function DashboardItems (props: DashboardItemsProps) {
             pathname == item.href
               ? "bg-default-100 text-primary"
               : "text-default-900 bg-none",
-            "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary hover:stroke-primary"
+            "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary hover:stroke-primary hover:bg-default-100"
           )}
         >
           <item.icon className="size-5 stroke-[1.5]" />

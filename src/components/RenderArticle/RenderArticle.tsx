@@ -7,6 +7,8 @@ import Document from '@tiptap/extension-document';
 import Heading from '@tiptap/extension-heading';
 import ListItem from '@tiptap/extension-list-item';
 import Paragraph from '@tiptap/extension-paragraph';
+import TaskItem from '@tiptap/extension-task-item';
+import TaskList from '@tiptap/extension-task-list';
 import Text from '@tiptap/extension-text';
 import { generateHTML } from '@tiptap/html';
 import { useMemo } from 'react';
@@ -17,6 +19,7 @@ import Code from '@tiptap/extension-code';
 import Link from '@tiptap/extension-link';
 import TextStyle from '@tiptap/extension-text-style';
 import Underline from '@tiptap/extension-underline';
+import OrderedList from '@tiptap/extension-ordered-list';
 
 export default function RenderArticle({ json }: RenderArticleProps) {
 
@@ -53,6 +56,9 @@ export default function RenderArticle({ json }: RenderArticleProps) {
         Blockquote,
         TextStyle,
         CodeBlock,
+        TaskList,
+        TaskItem,
+        OrderedList,
       ]);
     } catch (error) {
       console.error('Erro ao gerar HTML:', error);
@@ -66,7 +72,7 @@ export default function RenderArticle({ json }: RenderArticleProps) {
 
   return (
     <div
-      className="tex-left prose m-auto w-full sm:prose-lg dark:prose-invert prose-li:marker:text-primary-500"
+      className="tex-left prose m-auto w-full sm:prose-lg dark:prose-invert prose-li:marker:text-primary-500 marker:text-primary-500 select:bg-primary-300 select:text-white"
       dangerouslySetInnerHTML={{ __html: outPut }}
     />
   );
