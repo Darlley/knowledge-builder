@@ -1,127 +1,154 @@
 'use client'
 
 import { useState } from 'react'
-import { Radio, RadioGroup, Card, CardBody, CardHeader, Button } from '@nextui-org/react'
-import { CheckIcon } from 'lucide-react'
+import { Radio, RadioGroup, Card, CardBody, CardHeader, Button, Chip } from '@nextui-org/react'
+import { CheckCircle, CheckIcon } from 'lucide-react'
 
-const frequencias = [
-  { valor: 'mensal', rotulo: 'Mensal', sufixoPreco: '/mês' },
-  { valor: 'anual', rotulo: 'Anual', sufixoPreco: '/ano' },
-]
-const planos = [
-  {
-    nome: 'Freelancer',
-    id: 'plano-freelancer',
-    href: '#',
-    preco: { mensal: 'R$75', anual: 'R$720' },
-    descricao: 'O essencial para oferecer seu melhor trabalho aos clientes.',
-    recursos: ['5 produtos', 'Até 1.000 assinantes', 'Análises básicas', 'Tempo de resposta de suporte de 48 horas'],
-    maisPopular: false,
-  },
-  {
-    nome: 'Startup',
-    id: 'plano-startup',
-    href: '#',
-    preco: { mensal: 'R$150', anual: 'R$1.440' },
-    descricao: 'Um plano que cresce com seu negócio em rápida expansão.',
-    recursos: [
-      '25 produtos',
-      'Até 10.000 assinantes',
-      'Análises avançadas',
-      'Tempo de resposta de suporte de 24 horas',
-      'Automações de marketing',
-    ],
-    maisPopular: true,
-  },
-  {
-    nome: 'Empresarial',
-    id: 'plano-empresarial',
-    href: '#',
-    preco: { mensal: 'R$300', anual: 'R$2.880' },
-    descricao: 'Suporte dedicado e infraestrutura para sua empresa.',
-    recursos: [
-      'Produtos ilimitados',
-      'Assinantes ilimitados',
-      'Análises avançadas',
-      'Tempo de resposta de suporte dedicado de 1 hora',
-      'Automações de marketing',
-      'Ferramentas de relatórios personalizados',
-    ],
-    maisPopular: false,
-  },
+const frequencies = [
+  { value: 'monthly', label: 'Mensal', priceSuffix: '/mês' },
+  { value: 'yearly', label: 'Anual', priceSuffix: '/ano' },
 ]
 
-export default function Precos() {
-  const [frequencia, setFrequencia] = useState(frequencias[0])
+const plans = [
+  {
+    name: 'Freelancer',
+    id: 'plan-freelancer',
+    href: '#',
+    price: { monthly: 'Grátis', yearly: 'Grátis' },
+    description: 'Perfeito para começar seu blog.',
+    features: [
+      '1 blog',
+      '200 artigos',
+      '2.000 visualizações/mês',
+      'Domínio padrão',
+      'I.A. com sua chave de API',
+      'Tópicos pré-definidos',
+      'API básica (100 requisições/mês)',
+    ],
+    mostPopular: false,
+  },
+  {
+    name: 'Startup',
+    id: 'plan-startup',
+    href: '#',
+    price: { monthly: 'R$5', yearly: 'R$60' },
+    description: 'Ideal para blogs em crescimento.',
+    features: [
+      '2 blogs',
+      '1.200 artigos',
+      '20.000 visualizações/mês',
+      'Domínio personalizado',
+      'I.A. com sua chave de API',
+      'I.A. nativa (1.000 requisições/mês)',
+      'Sistema de comentários e likes',
+      'Login social',
+      'Criação de tópicos personalizados',
+      'API completa (1.000 requisições/mês)',
+    ],
+    mostPopular: true,
+  },
+  {
+    name: 'Empresarial',
+    id: 'plan-enterprise',
+    href: '#',
+    price: { monthly: 'R$35', yearly: 'R$420' },
+    description: 'Recursos avançados para grandes operações de blog.',
+    features: [
+      'Blogs ilimitados',
+      'Artigos ilimitados',
+      'Visualizações ilimitadas',
+      'Domínio personalizado',
+      'I.A. com sua chave de API',
+      'I.A. nativa ilimitada',
+      'Sistema de comentários avançado',
+      'Login social e SSO',
+      'Gerenciamento avançado de tópicos',
+      'API ilimitada com suporte prioritário',
+      'Análise de engajamento',
+      'Sistema de assinantes e newsletter',
+      'Automações de marketing',
+      'Integrações e Webhooks',
+    ],
+    mostPopular: false,
+  },
+]
+
+export default function Pricing() {
+  const [frequency, setFrequency] = useState(frequencies[0])
 
   return (
-    <div className="bg-white py-24 sm:py-32">
+    <div className="dark:bg-gray-950 p-4">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
-          <h2 className="text-base font-semibold leading-7 text-primary">Preços</h2>
-          <p className="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-            Planos de preços para equipes de&nbsp;todos&nbsp;os&nbsp;tamanhos
-          </p>
+          <Chip color='primary' variant='shadow' className="text-xs font-semibold leading-7">Preços</Chip>
+          <h1 className="mt-6 text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
+            Planos para todos os tipos de blogs
+          </h1>
         </div>
-        <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-gray-600">
-          Escolha um plano acessível repleto dos melhores recursos para engajar seu público, criar fidelidade do cliente e impulsionar vendas.
+        <p className="mx-auto mt-4 max-w-2xl text-center text-lg leading-8 text-gray-600 dark:text-gray-300">
+          Escolha o plano ideal para o seu blog, desde iniciantes até grandes operações.
         </p>
         <div className="mt-16 flex justify-center">
           <RadioGroup
             label="Frequência de pagamento"
             orientation="horizontal"
-            value={frequencia.valor}
-            onValueChange={(valor) => setFrequencia(frequencias.find((f) => f.valor === valor) || frequencias[0])}
+            value={frequency.value}
+            onValueChange={(value) => setFrequency(frequencies.find((f) => f.value === value) || frequencies[0])}
           >
-            {frequencias.map((opcao) => (
-              <Radio key={opcao.valor} value={opcao.valor}>
-                {opcao.rotulo}
+            {frequencies.map((option) => (
+              <Radio key={option.value} value={option.value}>
+                {option.label}
               </Radio>
             ))}
           </RadioGroup>
         </div>
         <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-3">
-          {planos.map((plano) => (
+          {plans.map((plan) => (
             <Card
-              key={plano.id}
+              key={plan.id}
               classNames={{
-                base: plano.maisPopular ? 'border-2 border-primary p-6' : 'p-6',
+                base: plan.mostPopular
+                  ? 'border-2 border-primary dark:border-primary p-6'
+                  : 'p-6 dark:bg-gray-950 border-2 dark:border-gray-900',
               }}
-              
               shadow="sm"
             >
               <CardHeader className="flex items-center justify-between">
-                <h3 className={`text-lg font-semibold ${plano.maisPopular ? 'text-primary' : 'text-gray-900'}`}>
-                  {plano.nome}
+                <h3 className={`text-lg font-semibold ${
+                  plan.mostPopular ? 'text-primary' : 'text-gray-900 dark:text-white'
+                }`}>
+                  {plan.name}
                 </h3>
-                {plano.maisPopular && (
+                {plan.mostPopular && (
                   <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
                     Mais popular
                   </span>
                 )}
               </CardHeader>
               <CardBody>
-                <p className="text-sm text-gray-600">{plano.descricao}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{plan.description}</p>
                 <p className="mt-6 flex items-baseline gap-x-1">
-                  <span className="text-4xl font-bold text-gray-900">{plano.preco[frequencia.valor as keyof typeof plano.preco]}</span>
-                  <span className="text-sm font-semibold text-gray-600">{frequencia.sufixoPreco}</span>
+                  <span className="text-4xl font-bold text-gray-900 dark:text-white">
+                    {plan.price[frequency.value as keyof typeof plan.price]}
+                  </span>
+                  <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">{frequency.priceSuffix}</span>
                 </p>
-                <Button
-                  href={plano.href}
-                  color={plano.maisPopular ? 'primary' : 'default'}
-                  variant={plano.maisPopular ? 'solid' : 'flat'}
-                  className="mt-6 w-full"
-                >
-                  Comprar plano
-                </Button>
-                <ul className="mt-8 space-y-3 text-sm text-gray-600">
-                  {plano.recursos.map((recurso) => (
-                    <li key={recurso} className="flex items-center gap-x-3">
-                      <CheckIcon className="h-5 w-5 flex-shrink-0 text-primary" />
-                      {recurso}
+                <ul className="my-8 space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                  {plan.features.map((feature) => (
+                    <li key={feature} className="flex items-center gap-x-3">
+                      <CheckCircle className="h-5 w-5 flex-shrink-0 text-primary" />
+                      {feature}
                     </li>
                   ))}
                 </ul>
+                <Button
+                  href={plan.href}
+                  color={plan.mostPopular ? 'primary' : 'default'}
+                  variant={plan.mostPopular ? 'solid' : 'flat'}
+                  className="w-full mt-auto"
+                >
+                  Comprar plano
+                </Button>
               </CardBody>
             </Card>
           ))}
