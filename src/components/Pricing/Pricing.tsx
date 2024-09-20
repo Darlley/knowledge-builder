@@ -108,7 +108,7 @@ export default function Pricing() {
               key={plan.id}
               classNames={{
                 base: plan.mostPopular
-                  ? 'border-2 border-primary dark:border-primary p-6'
+                  ? 'border-2 border-primary dark:border-primary dark:bg-gray-950 p-6'
                   : 'p-6 dark:bg-gray-950 border-2 dark:border-gray-900',
               }}
               shadow="sm"
