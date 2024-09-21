@@ -79,16 +79,16 @@ export default function layout({ children }: { children: ReactNode }) {
       </AnimatePresence>
 
       {/* Conteúdo principal */}
-      <div className="flex flex-col h-full max-h-full overflow-hidden">
+      <div className="flex flex-col h-full max-h-full overflow-hidden w-full">
         {/* Cabeçalho */}
-        <header className="flex h-14 items-center gap-4 border-b dark:border-slate-900 dark:bg-gray-950 bg-gray-100 px-4 lg:h-[60px] lg:px-6">
+        <header className="flex h-14 items-center gap-4 border-b dark:border-slate-900 dark:bg-gray-950 bg-gray-100 px-4 lg:h-[60px] lg:px-6 w-full">
           <div className="flex items-center justify-between w-full gap-x-5">
             {/* Menu hambúrguer para dispositivos móveis */}
             <Button className="md:hidden" isIconOnly variant="light" onClick={toggleMenu}>
               <Menu />
             </Button>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 w-full justify-between">
               <Dropdown placement="bottom-end">
                 <DropdownTrigger>
                   <User
@@ -131,7 +131,7 @@ export default function layout({ children }: { children: ReactNode }) {
         </header>
 
         {/* Conteúdo principal */}
-        <main className="flex-1 dark:bg-gray-950 h-full max-h-full overflow-y-auto flex-grow p-4">
+        <main className="flex-1 dark:bg-gray-950 h-full max-h-full overflow-y-auto flex-grow">
           {children}
         </main>
       </div>
