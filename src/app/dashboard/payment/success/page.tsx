@@ -25,7 +25,7 @@ export default function PagamentoSucesso() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center h-full bg-background">
+    <div className="flex flex-col items-center justify-center h-full dark:bg-gray-950">
       <Confetti
         width={windowDimensions.width}
         height={windowDimensions.height}
