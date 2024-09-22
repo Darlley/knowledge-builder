@@ -36,12 +36,13 @@ const plans = [
       'API básica (100 requisições/mês)',
     ],
     mostPopular: false,
+    buttonText: 'Aproveite seu plano',
   },
   {
     name: 'Startup',
     id: 'plan-startup',
     href: '#',
-    price: { monthly: 'R$5', yearly: 'R$60' },
+    price: { monthly: 'US$1', yearly: 'US$12' },
     description: 'Ideal para blogs em crescimento.',
     features: [
       '2 blogs',
@@ -56,12 +57,13 @@ const plans = [
       'API completa (1.000 requisições/mês)',
     ],
     mostPopular: true,
+    buttonText: 'Assinar',
   },
   {
     name: 'Empresarial',
     id: 'plan-enterprise',
     href: '#',
-    price: { monthly: 'R$35', yearly: 'R$420' },
+    price: { monthly: 'US$6', yearly: 'US$72' },
     description: 'Recursos avançados para grandes operações de blog.',
     features: [
       'Blogs ilimitados',
@@ -80,6 +82,7 @@ const plans = [
       'Integrações e Webhooks',
     ],
     mostPopular: false,
+    buttonText: 'Assinar',
   },
 ];
 
@@ -210,7 +213,7 @@ export default function Pricing() {
                   className="w-full mt-auto"
                   isLoading={loadingPlan === plan.id}
                 >
-                  {loadingPlan === plan.id ? 'Processando...' : 'Comprar plano'}
+                  {loadingPlan === plan.id ? 'Processando...' : plan.buttonText}
                 </Button>
               </CardBody>
             </Card>
