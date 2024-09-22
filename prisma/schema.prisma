@@ -21,6 +21,7 @@ model User {
   updatedAt    DateTime @default(now())
   posts        Post[]
   Site         Site[]
+  Subscription Subscription?
 }
 
 model Site {
@@ -53,6 +54,21 @@ model Post {
   User        User?           @relation(fields: [userId], references: [id])
 }
 
+model Subscription {
+  stripeSubscriptionId String @id @unique
+  interval String
+  status String
+  planId String
+  currentPeriodEnd Int
+  currentPeriodStart Int
+
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  User User? @relation(fields: [userId], references: [id])
+  userId String? @unique
+}
+
 enum UserRole {
   OWNER
   ADMIN
@@ -68,3 +84,4 @@ enum ArticleAudience {
   CLIENTS
   EMPLOYEES
 }
+
