@@ -30,7 +30,7 @@ export async function GET(){
     // Criar cliente no Stripe usando os dados do novo dbUser
     const customer = await stripe.customers.create({
       email: dbUser.email,
-      name: `${dbUser.firstName} ${dbUser.lastName}`,
+      name: dbUser.name,
     });
 
     // Atualizar o dbUser com o ID do cliente Stripe
@@ -47,7 +47,7 @@ export async function GET(){
     if (!customer) {
       customer = await stripe.customers.create({
         email: dbUser.email,
-        name: `${dbUser.firstName} ${dbUser.lastName}`,
+        name: dbUser.name,
       });
     }
   }

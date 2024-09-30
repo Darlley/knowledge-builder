@@ -5,7 +5,6 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   const { userId, planId } = await request.json();
-  console.log({ userId, planId });
   const user = await requireUser();
 
   if (userId && planId) {
@@ -19,6 +18,7 @@ export async function POST(request: NextRequest) {
           stripeCustomerId: true,
           email: true,
           firstName: true,
+          name: true
         },
       });
 
@@ -50,16 +50,28 @@ export async function POST(request: NextRequest) {
           throw new Error('Plano inválido');
       }
 
-      const session = await stripe.checkout.sessions.create({
-        customer: stripeUserId?.stripeCustomerId as string,
-        mode: 'subscription',
+      let customer = (await stripe.customers.list({
+        email: stripeUserId.email
+      })).data[0];
+  
+      if (!customer) {
+        customer = await stripe.customers.create({
+          email: stripeUserId.email,
+          name: stripeUserId.name,
+        });
+      }
+
+      const session = await stripe.checkout.sessions.create({        
+        payment_method_types: ['card'], // Aceita pagamentos com cartão
+        mode: 'subscription', // Modo de assinatura
+        client_reference_id: userId, // Referência ao usuário no sistema
+        customer: customer.id,
+        success_url: 'http://localhost:3000/dashboard/payment/success',
         billing_address_collection: 'auto',
-        payment_method_types: ['card'],
         customer_update: {
           address: 'auto',
           name: 'auto',
         },
-        success_url: 'http://localhost:3000/dashboard/payment/success',
         cancel_url: 'http://localhost:3000/dashboard/payment/cancelled',
         line_items: [
           {
