@@ -11,7 +11,7 @@ import { Prisma } from '@prisma/client';
  */
 export async function POST(req: Request) {
   const body = await req.text();
-  const signature = headers().get("Stripe-Signature") as string;
+  const signature = headers().get("stripe-signature") as string;
 
   let event: Stripe.Event;
 
@@ -51,6 +51,23 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
 
   if (!user) throw new Error("Usuário não encontrado");
 
+  // Cancela a assinatura anterior, se existir
+  const existingSubscription = await prisma.subscription.findUnique({
+    where: { userId: user.id },
+  });
+
+  if (existingSubscription) {
+    try {
+      await stripe.subscriptions.cancel(existingSubscription.stripeSubscriptionId);
+    } catch (error) {
+      if (error instanceof Stripe.errors.StripeInvalidRequestError) {
+        console.warn(`Assinatura não encontrada no Stripe: ${existingSubscription.stripeSubscriptionId}`);
+      } else {
+        throw error; // Lança outros erros
+      }
+    }
+  }
+
   const subscriptionData = {
     stripeSubscriptionId: subscription.id,
     userId: user.id,
@@ -66,6 +83,12 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     where: { userId: user.id },
     update: subscriptionData,
     create: subscriptionData,
+  });
+
+  // Atualiza o stripeSubscriptionId no modelo User
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { stripeSubscriptionId: subscription.id },
   });
 }
 

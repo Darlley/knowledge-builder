@@ -21,7 +21,6 @@ model User {
 
   stripeCustomerId String? @unique
   stripeSubscriptionId String?
-  stripeSubscriptionStatus String?
   
   createdAt    DateTime @default(now())
   updatedAt    DateTime @default(now())
