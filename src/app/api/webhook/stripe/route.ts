@@ -51,11 +51,17 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
 
   if (!user) throw new Error("User not found.");
 
+  
   // Cancela a assinatura anterior, se existir
   const existingSubscription = await prisma.subscription.findUnique({
     where: { userId: user.id }
   });
-
+  
+  // Apaga qualquer assinatura existente do usuário
+  await prisma.subscription.deleteMany({
+    where: { userId: user.id }
+  });
+  
   if (existingSubscription) {
     try {
       await stripe.subscriptions.cancel(existingSubscription.stripeSubscriptionId);
