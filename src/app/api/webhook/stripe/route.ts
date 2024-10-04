@@ -49,11 +49,11 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     where: { stripeCustomerId: customerId },
   });
 
-  if (!user) throw new Error("Usuário não encontrado");
+  if (!user) throw new Error("User not found.");
 
   // Cancela a assinatura anterior, se existir
   const existingSubscription = await prisma.subscription.findUnique({
-    where: { userId: user.id },
+    where: { userId: user.id }
   });
 
   if (existingSubscription) {
@@ -80,15 +80,9 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
 
   // Atualiza ou cria uma nova assinatura no banco de dados
   await prisma.subscription.upsert({
-    where: { userId: user.id },
+    where: { stripeSubscriptionId: subscriptionData?.stripeSubscriptionId },
     update: subscriptionData,
     create: subscriptionData,
-  });
-
-  // Atualiza o stripeSubscriptionId no modelo User
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { stripeSubscriptionId: subscription.id },
   });
 }
 
