@@ -37,7 +37,7 @@ export default function NovelEditor({
           attributes: {
             class: `prose dark:prose-invert prose-headings:font-title font-default focus:outline-none max-w-full h-full`,
           }
-      }}
+        }}
       >
         <EditorCommand className="z-50 h-auto max-h-[330px]  w-72 overflow-y-auto rounded-md border border-muted bg-background px-1 py-2 shadow-md transition-all">
           <EditorCommandEmpty className="px-2 text-muted-foreground">

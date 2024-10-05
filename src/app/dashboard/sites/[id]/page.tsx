@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react'
 import PostsStore from '@/stores/PostStore';
 import SiteStore from '@/stores/SiteStore'; // Adicione esta importação
 import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
@@ -74,10 +75,11 @@ export default function Page({
 }) {
   const { id: siteId } = params;
 
-  const { posts, isLoading, getPosts, deletePost } = PostsStore();
   const { getUser } = useKindeBrowserClient();
-  const { getSite, currentSite } = SiteStore(); // Adicione esta linha
   const user = getUser();
+
+  const { posts, isLoading, getPosts, deletePost } = PostsStore();
+  const { getSite, currentSite } = SiteStore(); // Adicione esta linha
 
   const [isDeleteAction, setIsDeleteAction] = useState(false);
 
@@ -120,7 +122,7 @@ export default function Page({
             href={`/blog/${currentSite?.subdirectory}`}
             target="_blank"
           >
-            <span>Acessar {currentSite?.name}</span>
+            <span>Ver site</span>
           </Button>
           <Button
             endContent={<Cog className="stroke-[1.5] size-5" />}
@@ -249,7 +251,7 @@ export default function Page({
                           size="sm"
                           isIconOnly
                           as={Link}
-                          href={`/${siteId}/blog/${item?.slug}`}
+                          href={`/blog/${currentSite?.subdirectory}/${item?.slug}`}
                           target="_blank"
                         >
                           <Link2 className="size-4 stroke-1" />

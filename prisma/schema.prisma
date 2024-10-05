@@ -15,10 +15,14 @@ model User {
   lastName     String
   email        String   @unique
   profileImage String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @default(now())
   posts        Post[]
   Site         Site[]
+  Subscription Subscription?
+
+  stripeCustomerId String? @unique
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
 }
 
 model Site {
@@ -29,7 +33,7 @@ model Site {
   imageUrl     String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @default(now())
-  userId       String?
+  userId       String? 
   posts        Post[]
   User         User?    @relation(fields: [userId], references: [id])
 }
@@ -51,6 +55,21 @@ model Post {
   User        User?           @relation(fields: [userId], references: [id])
 }
 
+model Subscription {
+  stripeSubscriptionId String @id @unique
+  interval String
+  status String
+  planId String
+  currentPeriodEnd Int
+  currentPeriodStart Int
+
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  User User? @relation(fields: [userId], references: [id])
+  userId String? @unique
+}
+
 enum UserRole {
   OWNER
   ADMIN
@@ -66,3 +85,4 @@ enum ArticleAudience {
   CLIENTS
   EMPLOYEES
 }
+
