@@ -1,1 +1,4 @@
-export interface PricingProps {}
+import { Subscription } from "@prisma/client";
+
+export interface PricingProps {
+}

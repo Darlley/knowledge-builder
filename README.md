@@ -10,19 +10,18 @@
 
 ## Features
 
-- 🌐 Implementação do roteador de aplicativos Next.js
-- 🔐 Autenticação Kinde com Autenticação de Fator Único
-- 📧 Autenticação sem Senha
-- 🔑 Autenticação OAuth com Google e GitHub
+- 🌐 App Router Next.js
+- 🔐 Autenticação Kinde com Linkedin, Google e GitHub
 - 💰 Pagamentos utilizando Stripe
 - 🪝 Implementação de Webhooks Stripe
-- 💿 Banco de Dados Postgres Supabase
+- 🎊 React Confetti para pagamentos concluidos
+- 🎲 Banco de Dados Postgres Supabase
 - 💨 ORM Prisma
-- ✅ Validação do Servidor usando Zod e Conform
-- 😱 Validação de Subdiretório Único
+- ✅ Validação do Servidor usando Zod
 - 🗂️ Upload de Arquivos com Uploadthing
-- 🎨 Estilização com Tailwindcss e Shadcn UI
-- 😶‍🌫️ Deploy para Vercel
+- 🎨 Estilização com Tailwindcss e NextUI
+- ✍️ Editor de artigos usando o Tiptap
+- 💿 Zustand para fazer a comunição Back-end/Front-end
 
 ## Setup Instructions
 
