@@ -7,7 +7,7 @@ import { z } from 'zod';
 
 /**
  * GET /api/sites
- * 
+ *
  * Retorna todos os sites associados a um usuário específico.
  * Requer autenticação.
  */
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
 
 /**
  * POST /api/sites
- * 
+ *
  * Cria um novo site para o usuário autenticado.
  * Verifica o plano de assinatura do usuário e limita a criação de sites de acordo.
  */
@@ -72,32 +72,30 @@ export async function POST(request: Request) {
     }),
   ]);
 
-  console.log("subscription.planId", subscription?.planId)
   const canCreateSite = () => {
-
     if (!subscription || subscription.status !== 'active') {
       return sites.length < 1;
     }
 
-
     switch (subscription.planId) {
-      case 'plan-freelancer':
-        return sites.length < 1;
       case process.env.STRIPE_STARTUP_PRICE_ID:
         return sites.length < 2;
       case process.env.STRIPE_ENTERPRISE_PRICE_ID:
         return true;
       default:
-        return false;
+        return sites.length < 1;
     }
   };
 
   if (!canCreateSite()) {
-    return NextResponse.json({
-      type: 'subscriptionError',
-      message: 'Você atingiu o limite de sites para o seu plano atual.',
-      error: 'Limite de sites atingido',
-    }, { status: 403 });
+    return NextResponse.json(
+      {
+        type: 'subscriptionError',
+        message: 'Você atingiu o limite de sites para o seu plano atual.',
+        error: 'Limite de sites atingido',
+      },
+      { status: 403 }
+    );
   }
 
   const { userId, ...formData } = await request.json();
@@ -106,12 +104,15 @@ export async function POST(request: Request) {
 
 /**
  * Função auxiliar para criar um novo site
- * 
+ *
  * @param userId - ID do usuário que está criando o site
  * @param formData - Dados do formulário para criar o site
  * @returns NextResponse com o resultado da operação
  */
-async function createSite(userId: string, formData: z.infer<ReturnType<typeof SiteCreateSchema>>) {
+async function createSite(
+  userId: string,
+  formData: z.infer<ReturnType<typeof SiteCreateSchema>>
+) {
   try {
     const isSubdirectoryUnique = async () => {
       const existingSite = await prisma.site.findUnique({
