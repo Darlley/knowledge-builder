@@ -19,7 +19,7 @@ export const plans = [
   },
   {
     name: 'Startup',
-    id: 'plan-startup',
+    id: process.env.NEXT_PUBLIC_STRIPE_STARTUP_PRICE_ID,
     price: { monthly: 'US$1', yearly: 'US$12' },
     description: 'Ideal para blogs em crescimento.',
     features: [
@@ -39,7 +39,7 @@ export const plans = [
   },
   {
     name: 'Empresarial',
-    id: 'plan-enterprise',
+    id: process.env.NEXT_PUBLIC_STRIPE_ENTERPRISE_PRICE_ID,
     price: { monthly: 'US$6', yearly: 'US$72' },
     description: 'Recursos avançados para grandes operações de blog.',
     features: [
