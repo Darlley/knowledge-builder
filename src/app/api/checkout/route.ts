@@ -40,10 +40,10 @@ export async function POST(request: NextRequest) {
 
       let priceId;
       switch (planId) {
-        case 'plan-startup':
+        case process.env.STRIPE_STARTUP_PRICE_ID:
           priceId = process.env.STRIPE_STARTUP_PRICE_ID;
           break;
-        case 'plan-enterprise':
+        case process.env.STRIPE_ENTERPRISE_PRICE_ID:
           priceId = process.env.STRIPE_ENTERPRISE_PRICE_ID;
           break;
         default:

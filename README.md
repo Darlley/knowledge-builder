@@ -1,12 +1,16 @@
-# Create a SaaS using Next.js, Kinde-Auth, Supabase, Prisma, Stripe, and Tailwind CSS. 
+# Create a SaaS using Next.js, Kinde-Auth, Supabase, Prisma, Stripe, and Tailwind CSS.
 
-> [!NOTE]
-> **Vídeo:** Create a SaaS using Next.js, Kinde-Auth, Supabase, Prisma, Stripe, and Tailwind CSS.  
-> **Link do vídeo:** [https://youtu.be/_ypZyGeJox8](https://youtu.be/_ypZyGeJox8)  
+> [!NOTE] > **Vídeo:** Create a SaaS using Next.js, Kinde-Auth, Supabase, Prisma, Stripe, and Tailwind CSS.  
+> **Link do vídeo:** [https://youtu.be/\_ypZyGeJox8](https://youtu.be/_ypZyGeJox8)  
 > **Minuto atual:** 9:45:58  
 > **Minutos totais:** 11:16:37  
 > **Autor:** Jan Marshal  
 > **Link do canal:** [https://www.youtube.com/@janmarshalcoding](https://www.youtube.com/@janmarshalcoding)
+
+## DEMO
+
+- [Criação de conta e assinatura](https://www.loom.com/share/abb0f2a7933941fabc04e77dcbd17283?sid=77a2ecf5-e6a1-47f7-ba06-f7c95bd7477c)
+- [Criação de artigo e visualização](https://www.loom.com/share/00a1da96defd434aa0f4c726710103dd?sid=d72db895-8d81-469c-b498-b91d3425dbdb)
 
 ## Features
 
