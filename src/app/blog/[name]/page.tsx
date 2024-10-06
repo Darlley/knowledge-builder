@@ -1,3 +1,4 @@
+import React from 'react'; // Adicione esta linha
 import prisma from '@/utils/db';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';

@@ -1,5 +1,8 @@
 'use client';
 
+import { frequencies } from '@/constants/plan-frequece';
+import { plans } from '@/constants/plans';
+import prisma from '@/utils/db';
 import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
 import {
   Button,
@@ -13,78 +16,6 @@ import {
 import { CheckCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-
-const frequencies = [
-  { value: 'monthly', label: 'Mensal', priceSuffix: '/mês' },
-  { value: 'yearly', label: 'Anual', priceSuffix: '/ano' },
-];
-
-const plans = [
-  {
-    name: 'Freelancer',
-    id: 'plan-freelancer',
-    href: '/dashboard',
-    price: { monthly: 'Grátis', yearly: 'Grátis' },
-    description: 'Perfeito para começar seu blog.',
-    features: [
-      '1 blog',
-      '200 artigos',
-      '2.000 visualizações/mês',
-      'Domínio padrão',
-      'I.A. com sua chave de API',
-      'Tópicos pré-definidos',
-      'API básica (100 requisições/mês)',
-    ],
-    mostPopular: false,
-    buttonText: 'Aproveite seu plano',
-  },
-  {
-    name: 'Startup',
-    id: 'plan-startup',
-    href: '#',
-    price: { monthly: 'US$1', yearly: 'US$12' },
-    description: 'Ideal para blogs em crescimento.',
-    features: [
-      '2 blogs',
-      '1.200 artigos',
-      '20.000 visualizações/mês',
-      'Domínio personalizado',
-      'I.A. com sua chave de API',
-      'I.A. nativa (1.000 requisições/mês)',
-      'Sistema de comentários e likes',
-      'Login social',
-      'Criação de tópicos personalizados',
-      'API completa (1.000 requisições/mês)',
-    ],
-    mostPopular: true,
-    buttonText: 'Assinar',
-  },
-  {
-    name: 'Empresarial',
-    id: 'plan-enterprise',
-    href: '#',
-    price: { monthly: 'US$6', yearly: 'US$72' },
-    description: 'Recursos avançados para grandes operações de blog.',
-    features: [
-      'Blogs ilimitados',
-      'Artigos ilimitados',
-      'Visualizações ilimitadas',
-      'Domínio personalizado',
-      'I.A. com sua chave de API',
-      'I.A. nativa ilimitada',
-      'Sistema de comentários avançado',
-      'Login social e SSO',
-      'Gerenciamento avançado de tópicos',
-      'API ilimitada com suporte prioritário',
-      'Análise de engajamento',
-      'Sistema de assinantes e newsletter',
-      'Automações de marketing',
-      'Integrações e Webhooks',
-    ],
-    mostPopular: false,
-    buttonText: 'Assinar',
-  },
-];
 
 export default function Pricing() {
   const [frequency, setFrequency] = useState(frequencies[0]);
