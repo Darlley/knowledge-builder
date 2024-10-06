@@ -10,7 +10,12 @@
 ## DEMO
 
 - [Criação de conta e assinatura](https://www.loom.com/share/abb0f2a7933941fabc04e77dcbd17283?sid=77a2ecf5-e6a1-47f7-ba06-f7c95bd7477c)
+
+<div style="position: relative; padding-bottom: 53.125%; height: 0;"><iframe src="https://www.loom.com/embed/abb0f2a7933941fabc04e77dcbd17283?sid=bfef5ac7-3ab6-40f5-b8f1-56ef6fe6f894" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe></div>
+
 - [Criação de artigo e visualização](https://www.loom.com/share/00a1da96defd434aa0f4c726710103dd?sid=d72db895-8d81-469c-b498-b91d3425dbdb)
+
+<div style="position: relative; padding-bottom: 53.125%; height: 0;"><iframe src="https://www.loom.com/embed/00a1da96defd434aa0f4c726710103dd?sid=31719a75-d664-4f9b-9f89-aba2120f9f5f" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe></div>
 
 ## Features
 
