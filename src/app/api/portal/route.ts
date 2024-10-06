@@ -27,7 +27,6 @@ export async function POST(request: NextRequest) {
     );
   }
   
-  console.log("userExists", userExists)
   try {
     const session = await stripe.billingPortal.sessions.create({
       customer: userExists?.stripeCustomerId as string,

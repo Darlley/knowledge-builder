@@ -1,3 +1,4 @@
+import React from 'react'
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Toaster } from 'sonner';
@@ -18,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" suppressHydrationWarning={true}>
-      <body className={inter.className}>
+      <body className={`${inter.className} h-full w-full `}>
         <Providers>
           {children}
           <Toaster position="bottom-left" />
